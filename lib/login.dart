@@ -9,6 +9,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isButtonVisible = true; // Flag to track button visibility
+  bool _passwordVisible = false; // Flag to manage password visibility
 
   @override
   void initState() {
@@ -80,28 +81,38 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                       const TextField(
                         decoration: InputDecoration(
                           labelText: 'Username',
-                          prefixIcon: Icon(Icons.person), 
+                          prefixIcon: Icon(Icons.person),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const TextField(
+                      TextField(
+                        obscureText: !_passwordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock), 
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _passwordVisible = !_passwordVisible;
+                              });
+                            },
+                          ),
                         ),
-                        obscureText: true,
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                         
+                          // Implement sign-in functionality
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 236, 228, 228), // Set the button color to gray
+                          backgroundColor: const Color.fromARGB(255, 236, 228, 228),
                         ),
                         child: const Text('Sign In'),
                       ),
-                      const Spacer(), 
+                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -115,7 +126,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                           const SizedBox(height: 8),
                           GestureDetector(
                             onTap: () {
-                             
+                              // Implement contact admin functionality
                             },
                             child: const Text(
                               'Contact an admin',
@@ -134,7 +145,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
               ),
             ),
           ),
-          if (_isButtonVisible) 
+          if (_isButtonVisible)
             Center(
               child: ElevatedButton(
                 onPressed: _toggleSignIn,
@@ -142,12 +153,12 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
               ),
             ),
           Positioned(
-            top: 40.0, 
-            left: MediaQuery.of(context).size.width / 2 - 200, 
+            top: 40.0,
+            left: MediaQuery.of(context).size.width / 2 - 200,
             child: Image.asset(
               'assets/logo.png',
-              width: 400, 
-              height: 400, 
+              width: 400,
+              height: 400,
             ),
           ),
         ],
