@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'home.dart';  // Import the HomePage
 
 class SignInPage extends StatefulWidget {
   @override
@@ -8,8 +11,10 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _isButtonVisible = true; // Flag to track button visibility
-  bool _passwordVisible = false; // Flag to manage password visibility
+  bool _isButtonVisible = true;
+  bool _passwordVisible = false;
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -38,10 +43,52 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
     }
   }
 
+  Future<void> _signIn() async {
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost/QUEUE-TEETH/lib/login.php'),  
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'username': username,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        if (responseBody['success']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseBody['message'])),
+          );
+          
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseBody['message'])),
+          );
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 40, 217, 214), // Set the background color
+      backgroundColor: const Color.fromARGB(255, 40, 217, 214),
       body: Stack(
         children: [
           Positioned(
@@ -54,9 +101,9 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                 end: const Offset(0, 1),
               ).animate(_animation),
               child: Container(
-                height: 500.0, // Set the height here
+                height: 500.0,
                 decoration: const BoxDecoration(
-                  color: Colors.white, // Ensure the sign-in box is visible against the background
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.0),
                     topRight: Radius.circular(30.0),
@@ -78,14 +125,16 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
-                      const TextField(
-                        decoration: InputDecoration(
+                      TextField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
                           labelText: 'Username',
                           prefixIcon: Icon(Icons.person),
                         ),
                       ),
                       const SizedBox(height: 20),
                       TextField(
+                        controller: _passwordController,
                         obscureText: !_passwordVisible,
                         decoration: InputDecoration(
                           labelText: 'Password',
@@ -104,9 +153,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {
-                          // Implement sign-in functionality
-                        },
+                        onPressed: _signIn,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromARGB(255, 236, 228, 228),
                         ),
