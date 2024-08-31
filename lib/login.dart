@@ -8,6 +8,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  bool _isButtonVisible = true; // Flag to track button visibility
 
   @override
   void initState() {
@@ -25,24 +26,21 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
   void _toggleSignIn() {
     if (_controller.isCompleted) {
       _controller.reverse();
+      setState(() {
+        _isButtonVisible = true;
+      });
     } else {
       _controller.forward();
+      setState(() {
+        _isButtonVisible = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Set the background color to black
-      appBar: AppBar(
-        title: Image.asset(
-          'assets/logo.png', // Ensure you have a logo image in the assets folder
-          height: 700,
-           // Adjust height as needed
-        ),
-        backgroundColor: Colors.black, // Match the background color
-        elevation: 0, // Remove the shadow
-      ),
+      backgroundColor: const Color.fromARGB(255, 40, 217, 214), // Set the background color
       body: Stack(
         children: [
           Positioned(
@@ -55,9 +53,9 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                 end: const Offset(0, 1),
               ).animate(_animation),
               child: Container(
-                height: 460.0, // Set the height here
+                height: 500.0, // Set the height here
                 decoration: const BoxDecoration(
-                  color: Colors.white, // Ensure the sign-in box is visible against the black background
+                  color: Colors.white, // Ensure the sign-in box is visible against the background
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.0),
                     topRight: Radius.circular(30.0),
@@ -69,22 +67,66 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      const TextField(
-                        decoration: InputDecoration(labelText: 'Username'),
+                      const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 20),
                       const TextField(
-                        decoration: InputDecoration(labelText: 'Password'),
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          prefixIcon: Icon(Icons.person), 
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const TextField(
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: Icon(Icons.lock), 
+                        ),
                         obscureText: true,
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          // Handle sign-in action
+                         
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromARGB(255, 236, 228, 228), // Set the button color to gray
                         ),
                         child: const Text('Sign In'),
+                      ),
+                      const Spacer(), 
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Don\'t have an account yet?',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: () {
+                             
+                            },
+                            child: const Text(
+                              'Contact an admin',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -92,10 +134,20 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
               ),
             ),
           ),
-          Center(
-            child: ElevatedButton(
-              onPressed: _toggleSignIn,
-              child: const Text('LOGIN'),
+          if (_isButtonVisible) 
+            Center(
+              child: ElevatedButton(
+                onPressed: _toggleSignIn,
+                child: const Text('LOGIN'),
+              ),
+            ),
+          Positioned(
+            top: 40.0, 
+            left: MediaQuery.of(context).size.width / 2 - 200, 
+            child: Image.asset(
+              'assets/logo.png',
+              width: 400, 
+              height: 400, 
             ),
           ),
         ],
