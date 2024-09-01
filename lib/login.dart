@@ -235,7 +235,7 @@ colors: [
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        child: Text(
+        child: const Text(
           'LOGIN',
           style: TextStyle(
             fontSize: 18.0,
