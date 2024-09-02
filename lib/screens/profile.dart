@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MyProfile extends StatelessWidget {
+class ProfilePage extends StatelessWidget {
   final String imagePath = 'assets/pogisivenz.png';
   final String userName = 'MEOWMEOWMEOW'; 
 
@@ -56,6 +56,6 @@ class MyProfile extends StatelessWidget {
 
 void main() {
   runApp(MaterialApp(
-    home: MyProfile(),
+    home: ProfilePage(),
   ));
 }

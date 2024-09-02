@@ -6,10 +6,11 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SignInPage(), // Use the SignInPage class from login.dart
-    );
-  }
+ @override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: SignInPage(),
+  );
+}
 }
