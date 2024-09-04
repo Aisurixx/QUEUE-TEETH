@@ -124,7 +124,7 @@ colors: [
               child: SlideTransition(
                 position: _animation,
                 child: Container(
-                  height: 500.0,
+                  height: 450.0,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
