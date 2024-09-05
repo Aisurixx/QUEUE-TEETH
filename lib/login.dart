@@ -50,9 +50,27 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
     final username = _usernameController.text;
     final password = _passwordController.text;
 
+    // Directly check credentials
+    if (username == "harold" && password == "123") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign in successful!')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid username or password')),
+      );
+    }
+
+    // Commented out HTTP request codeE
+    /*
     try {
       final response = await http.post(
-        Uri.parse('http://localhost/QUEUE-TEETH/lib/login.php'),  
+        Uri.parse('http://localhost/QUEUE-TEETH/lib/login.php'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -86,6 +104,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
+    */
   }
 
   @override
@@ -94,18 +113,18 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-colors: [
-      Color(0xFFD1E9F6),  // Keep this light blue
-      Color(0xFFA4C7E1),  // Slightly darker blue
-      Color(0xFF6D9DBA),  // Medium blue
-      Color(0xFF4A7791),  // Darker blue
-      Color(0xFF314F78),  // Dark blue
-    ],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 0.25, 0.5, 0.75, 1.0],  // Evenly distribute the colors
-  ),
-),
+            colors: [
+              Color(0xFFD1E9F6),
+              Color(0xFFA4C7E1),
+              Color(0xFF6D9DBA),
+              Color(0xFF4A7791),
+              Color(0xFF314F78),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+          ),
+        ),
         child: Stack(
           children: [
             Positioned(
@@ -124,7 +143,7 @@ colors: [
               child: SlideTransition(
                 position: _animation,
                 child: Container(
-                  height: 450.0,
+                  height: 500.0,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -132,8 +151,6 @@ colors: [
                       topRight: Radius.circular(30.0),
                     ),
                   ),
-
-                  
                   child: Padding(
                     padding: const EdgeInsets.all(50.0),
                     child: Column(
@@ -200,7 +217,7 @@ colors: [
                             const SizedBox(height: 8),
                             GestureDetector(
                               onTap: () {
-                                
+                                // Handle contact admin
                               },
                               child: const Text(
                                 'Contact an admin',
@@ -219,36 +236,34 @@ colors: [
                 ),
               ),
             ),
-         if (_isButtonVisible)
-  Positioned(
-    top: 200,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    child: Center(
-      child: ElevatedButton(
-        onPressed: _toggleSignIn,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-        child: const Text(
-          'LOGIN',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ),
-    ),
-  ),
-
-
+            if (_isButtonVisible)
+              Positioned(
+                top: 200,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: _toggleSignIn,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: const Text(
+                      'LOGIN',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
