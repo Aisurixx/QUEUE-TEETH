@@ -30,7 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  table_calendar: ^3.0.6
+  flutter_localizations:
+    sdk: flutter
   http: ^1.2.2
 
 

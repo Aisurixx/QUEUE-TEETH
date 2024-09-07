@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screens/profile.dart';
-import 'screens/home_screen.dart';
+import 'screens/profile.dart'; // Ensure ProfilePage is defined in profile.dart
+import 'screens/home_screen.dart'; // Ensure HomeScreen is defined in home_screen.dart
+import 'calendar_page.dart'; 
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -44,15 +46,14 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 10), // Add space at the top
+                    padding: EdgeInsets.only(top: 10),
                     child: CircleAvatar(
                       backgroundImage: AssetImage('assets/pogisivenz.png'),
                       radius: 20,
                     ),
                   ),
                   SizedBox(width: 10),
-                  // Set a static or empty title here
-                  Text('Hi, Harold Pogi'), // Or you can use an empty string: Text(''),
+                  Text('Hi, Harold Pogi'),
                 ],
               ),
             ),
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
       body: _pages[_bottomNavIndex],
       bottomNavigationBar: Container(
         margin: EdgeInsets.only(bottom: 30.0),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(50.0),
@@ -85,7 +86,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
+          borderRadius: BorderRadius.vertical(
             top: Radius.circular(30.0),
             bottom: Radius.circular(30.0),
           ),
@@ -162,15 +163,15 @@ class _HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: const Icon(Icons.calendar_month, color: Colors.black),
-                  title: const Text('Calendar'),
+                  leading: Icon(Icons.calendar_month, color: Colors.black),
+                  title: Text('Calendar'),
                   onTap: () {
                     Navigator.pop(context);
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.location_on, color: Colors.black),
-                  title: const Text('Location'),
+                  leading: Icon(Icons.location_on, color: Colors.black),
+                  title: Text('Location'),
                   onTap: () {
                     Navigator.pop(context);
                   },
@@ -192,10 +193,41 @@ class _HomePageState extends State<HomePage> {
 }
 
 class AppointmentPage extends StatelessWidget {
+  final List<Map<String, String>> choices = [
+    {'value': 'pasta', 'label': 'Pasta'},
+    {'value': 'teeth_clean', 'label': 'Teeth Cleaning'},
+    {'value': 'routine_cleanings', 'label': 'Routine Cleanings'},
+    {'value': 'teeth_whitening', 'label': 'Teeth Whitening'},
+    {'value': 'root_canals', 'label': 'Root Canals'},
+    {'value': 'extractions', 'label': 'Extractions'},
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Appointment Page Content'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Appointments'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: choices.map((choice) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CalendarPage()),
+                  );
+                },
+                child: Text(choice['label']!),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }
