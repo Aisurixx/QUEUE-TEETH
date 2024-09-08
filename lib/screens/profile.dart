@@ -9,6 +9,12 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // This will navigate back to the previous screen
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
