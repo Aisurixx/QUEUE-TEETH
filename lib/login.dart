@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui'; // Import for ImageFilter
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home.dart';
@@ -50,12 +51,10 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
     final username = _usernameController.text;
     final password = _passwordController.text;
 
-    // Directly check credentials
     if (username == "harold" && password == "123") {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign in successful!')),
       );
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -65,64 +64,16 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
         SnackBar(content: Text('Invalid username or password')),
       );
     }
-
-    // Commented out HTTP request codeE
-    /*
-    try {
-      final response = await http.post(
-        Uri.parse('http://localhost/QUEUE-TEETH/lib/login.php'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'username': username,
-          'password': password,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        if (responseBody['success']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(responseBody['message'])),
-          );
-          
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(responseBody['message'])),
-          );
-        }
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
-    }
-    */
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFD1E9F6),
-              Color(0xFFA4C7E1),
-              Color(0xFF6D9DBA),
-              Color(0xFF4A7791),
-              Color(0xFF314F78),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/splash.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Stack(
@@ -142,95 +93,108 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
               right: 0,
               child: SlideTransition(
                 position: _animation,
-                child: Container(
-                  height: 500.0,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30.0),
-                      topRight: Radius.circular(30.0),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(50.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                    child: Container(
+                      height: 400.0, // Adjusted height
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(30.0),
+                          topRight: Radius.circular(30.0),
                         ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: _usernameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Username',
-                            prefixIcon: Icon(Icons.person),
+                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20.0,
+                            spreadRadius: 1.0,
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: _passwordController,
-                          obscureText: !_passwordVisible,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: Icon(Icons.lock),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _signIn,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 236, 228, 228),
-                          ),
-                          child: const Text('Sign In'),
-                        ),
-                        const Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(50.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
                             const Text(
-                              'Don\'t have an account yet?',
+                              'Sign In',
                               style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black,
-                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+                            TextField(
+                              controller: _usernameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Username',
+                                prefixIcon: Icon(Icons.person),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            GestureDetector(
-                              onTap: () {
-                                // Handle contact admin
-                              },
-                              child: const Text(
-                                'Contact an admin',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                            const SizedBox(height: 20),
+                            TextField(
+                              controller: _passwordController,
+                              obscureText: !_passwordVisible,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: Icon(Icons.lock),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _passwordVisible = !_passwordVisible;
+                                    });
+                                  },
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _signIn,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 236, 228, 228),
+                              ),
+                              child: const Text('Sign In'),
+                            ),
+                            const Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Don\'t have an account yet?',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Handle contact admin
+                                  },
+                                  child: const Text(
+                                    'Contact an admin',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
