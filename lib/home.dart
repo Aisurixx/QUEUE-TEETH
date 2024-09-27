@@ -3,7 +3,6 @@ import 'screens/profile.dart'; // Ensure ProfilePage is defined in profile.dart
 import 'screens/home_screen.dart'; // Ensure HomeScreen is defined in home_screen.dart
 import 'calendar_page.dart'; 
 
-
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -43,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(builder: (context) => ProfilePage()),
                 );
               },
-              child: Row(
+              child: const Row(
                 children: [
                   Padding(
                     padding: EdgeInsets.only(top: 10),
@@ -68,7 +67,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _pages[_bottomNavIndex],
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/splash.png'), // Replace with your image path
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _pages[_bottomNavIndex],
+      ),
       bottomNavigationBar: Container(
         margin: EdgeInsets.only(bottom: 30.0),
         decoration: BoxDecoration(
