@@ -17,7 +17,7 @@ class ProfilePage extends StatelessWidget {
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(appBarBackgroundImagePath), // Background image for AppBar
-              fit: BoxFit.cover, // Cover the AppBar
+              fit: BoxFit.cover, // Cover the AppBard
             ),
           ),
           child: AppBar(
