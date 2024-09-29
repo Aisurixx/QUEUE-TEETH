@@ -47,7 +47,7 @@ dev_dependencies:
 
 flutter_native_splash:
   color: "#ffffff"  # Background color
-  image: assets/splash.png  # Path to your logo/image
+  image: assets/logo.png  # Path to your logo/image
   
 
 
