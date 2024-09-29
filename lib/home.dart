@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/profile.dart'; // Ensure ProfilePage is defined in profile.dart
-import 'screens/home_screen.dart'; // Ensure HomeScreen is defined in home_screen.dart
-import 'book_appointment.dart'; // Import book_appointment.dart here
+import 'home_screen.dart'; // Ensure HomeScreen is defined in home_screen.dart
+import 'book_appointment.dart'; // Ensure AppointmentPage is defined in book_appointment.dart
+import 'screens/history.dart'; // Ensure HistoryPage is defined in history.dart
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,70 +15,85 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     HomeScreen(),
     AppointmentPage(),
-    // Add more pages here if needed
+    HistoryPage(),
   ];
 
   final List<IconData> _iconList = [
     Icons.home_filled,
     Icons.add_rounded,
-    // Add more icons if needed
+    Icons.history_edu,
   ];
 
   final List<String> _titleList = [
     'Home',
     'Appointments',
-    // Add more titles if needed
+    'History',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()),
-                );
-              },
-              child: const Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 10),
-                    child: CircleAvatar(
-                      backgroundImage: AssetImage('assets/pogisivenz.png'),
-                      radius: 20,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Text('Hi, Harold Pogi'),
-                ],
-              ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80), // Adjust the height of the AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/appbar.png'), // Path to your background image
+              fit: BoxFit.cover, // Adjust this as needed (e.g., cover, contain, etc.)
             ),
-          ],
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent, // Make AppBar transparent
+            title: Row(
+              children: [
+                GestureDetector(
+  onTap: () {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ProfilePage()),
+    );
+  },
+  child: Row(
+    children: [
+      Padding(
+        padding: EdgeInsets.only(top: 10),
+        child: CircleAvatar(
+          backgroundImage: AssetImage('assets/pogisivenz.png'), // Profile image path
+          radius: 20,
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              _showSettingsDialog(context);
-            },
+      ),
+      SizedBox(width: 10),
+      Text(
+        'Hi, Harold Pogi',
+        style: TextStyle(color: Color(0xFFE5D9F2)), // Set the text color here
+      ),
+    ],
+  ),
+),
+
+
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Stack(
+        children: [
+          // Full screen background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/splash.png', // Background image path
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Main content displaying the current page
+          Positioned.fill(
+            child: _pages[_bottomNavIndex],
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Replace with your image path
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: _pages[_bottomNavIndex],
-      ),
       bottomNavigationBar: Container(
-        margin: EdgeInsets.only(bottom: 30.0),
+        margin: const EdgeInsets.only(bottom: 30.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(
@@ -103,98 +119,39 @@ class _HomePageState extends State<HomePage> {
               BottomNavigationBarItem(
                 icon: Icon(
                   _iconList[0],
-                  color: _bottomNavIndex == 0 ? Colors.blue : Colors.black,
+                  color: _bottomNavIndex == 0
+                      ? const Color.fromARGB(255, 116, 23, 133)
+                      : Colors.black,
                 ),
                 label: _titleList[0],
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   _iconList[1],
-                  color: _bottomNavIndex == 1 ? Colors.blue : Colors.black,
+                  color: _bottomNavIndex == 1
+                      ? const Color.fromARGB(255, 116, 23, 133)
+                      : Colors.black,
                 ),
                 label: _titleList[1],
               ),
               BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.format_list_bulleted_sharp,
-                  color: _bottomNavIndex == 2 ? Colors.blue : Colors.black,
+                  _iconList[2],
+                  color: _bottomNavIndex == 2
+                      ? const Color.fromARGB(255, 116, 23, 133)
+                      : Colors.black,
                 ),
-                label: '',
+                label: _titleList[2],
               ),
             ],
             onTap: (index) {
-              if (index == 2) {
-                _showSelectMenu(context);
-              } else {
-                setState(() {
-                  _bottomNavIndex = index;
-                });
-              }
+              setState(() {
+                _bottomNavIndex = index;
+              });
             },
           ),
         ),
       ),
-    );
-  }
-
-  void _showSettingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Settings'),
-          content: Text('Settings options go here.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showSelectMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          width: MediaQuery.of(context).size.width * 0.8,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: Icon(Icons.calendar_month, color: Colors.black),
-                  title: Text('Calendar'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.location_on, color: Colors.black),
-                  title: Text('Location'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.history_edu, color: Colors.black),
-                  title: Text('History'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

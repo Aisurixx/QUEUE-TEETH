@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'time_selection_page.dart'; // Make sure this path is correct
 
-
 class CalendarPage extends StatefulWidget {
   @override
   _CalendarPageState createState() => _CalendarPageState();
@@ -22,32 +21,61 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Date'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TimeSelectionPage(selectedDate: _selectedDay),
-                  ),
-                );
-              },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80.0), // Adjust height as needed
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/appbar.png'), // Path to your image
+              fit: BoxFit.cover, // Cover the AppBar
             ),
-          ],
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent, // Make AppBar transparent
+            title: Text(
+              'Select Date',
+              style: TextStyle(
+                color: Color(0xFFE5D9F2), // Change text color if needed
+              ),
+            ),
+            centerTitle: true, // Center the title
+            iconTheme: IconThemeData(
+              color: Color(0xFFE5D9F2), // Set back button color
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/splash.png'), // Path to your image
+            fit: BoxFit.cover, // Cover the entire screen
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TableCalendar(
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                onDaySelected: (selectedDay, focusedDay) {
+                  setState(() {
+                    _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                  });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TimeSelectionPage(selectedDate: _selectedDay),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

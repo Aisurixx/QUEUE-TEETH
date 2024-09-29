@@ -10,11 +10,16 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         extendBodyBehindAppBar: true, // Ensures the background extends behind the AppBar
         extendBody: true, // Ensures the background extends behind the navigation bar
-        appBar: AppBar(
-          title: const Text(''),
-          automaticallyImplyLeading: false, // Removes the back button
-          backgroundColor: Colors.transparent, // Make AppBar transparent to show background
-          elevation: 0, // Remove shadow under the AppBar
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80.0), // Set height of AppBar
+          child: Container(
+            child: AppBar(
+              title: const Text(''),
+              automaticallyImplyLeading: false, // Removes the back button
+              backgroundColor: Colors.transparent, // Make AppBar transparent to show background
+              elevation: 0, // Remove shadow under the AppBar
+            ),
+          ),
         ),
         body: Stack(
           children: [
@@ -24,7 +29,7 @@ class HomeScreen extends StatelessWidget {
               height: double.infinity,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/33.png'), // Replace with your background image path
+                  image: AssetImage('assets/splash.png'), // Replace with your background image path
                   fit: BoxFit.cover, // Ensure the image covers the entire screen
                 ),
               ),
@@ -49,7 +54,7 @@ class HomeScreen extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            // You can add colors to the gradient if needed
+            // Add colors to the gradient if needed
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

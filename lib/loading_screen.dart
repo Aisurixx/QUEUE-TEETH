@@ -27,7 +27,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/33.png'), // Your background image path
+            image: AssetImage('assets/splash.png'), // Your background image path
             fit: BoxFit.cover,
           ),
         ),
