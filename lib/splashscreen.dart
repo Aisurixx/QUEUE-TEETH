@@ -13,7 +13,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive); // Hides status and navigation bars
 
-    Future.delayed(Duration(seconds:5), () {
+    Future.delayed(Duration(seconds:2), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => SignInPage()),
       );
@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Colors.white,
+        color: const Color.fromARGB(255, 2, 2, 2),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

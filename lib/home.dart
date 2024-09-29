@@ -67,14 +67,17 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Replace with your image path
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background Image
+          Image.asset(
+            'assets/splash.png', // Ensure this path is correct
             fit: BoxFit.cover,
           ),
-        ),
-        child: _pages[_bottomNavIndex],
+          // Main content
+          _pages[_bottomNavIndex],
+        ],
       ),
       bottomNavigationBar: Container(
         margin: EdgeInsets.only(bottom: 30.0),
