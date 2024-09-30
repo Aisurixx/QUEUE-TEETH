@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:ui'; // Import for ImageFilter
 import 'home.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthService {
   Future<bool> signIn(String email, String password) async {
-    await Future.delayed(Duration(seconds: 2)); // Simulate loading time
-    return email == "harold@example.com" && password == "123456"; // Example condition
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/api/auth/login'), // Update with your Laravel API URL
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+
+    return response.statusCode == 200; // Return true for successful login
   }
 }
 
@@ -303,6 +310,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                 ),
               ),
           ],
+
         ),
       ),
     );
