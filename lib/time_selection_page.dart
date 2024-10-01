@@ -10,13 +10,13 @@ class TimeSelectionPage extends StatefulWidget {
 }
 
 class _TimeSelectionPageState extends State<TimeSelectionPage> {
-  TimeOfDay _selectedTime = TimeOfDay.now();
+  TimeOfDay? _selectedTime; // Make _selectedTime nullable
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.0), // Set the height of the AppBar
+        preferredSize: Size.fromHeight(60.0), // Set the height of the AppBar
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -52,32 +52,37 @@ class _TimeSelectionPageState extends State<TimeSelectionPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Selected Date: ${widget.selectedDate.toLocal()}',
-                style: TextStyle(fontSize: 16, color: Colors.black), // Adjust text color if needed
-              ),
-              SizedBox(height: 20),
+              SizedBox(height: 20), // Add some space from the top
               ElevatedButton(
                 onPressed: () async {
                   final TimeOfDay? picked = await showTimePicker(
                     context: context,
-                    initialTime: _selectedTime,
+                    initialTime: _selectedTime ?? TimeOfDay.now(),
                   );
-                  if (picked != null && picked != _selectedTime) {
+                  if (picked != null) {
                     setState(() {
                       _selectedTime = picked;
                     });
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40), // Increase button size
+                  textStyle: TextStyle(fontSize: 18), // Increase font size
+                ),
                 child: Text('Pick Time'),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 30), // Space between button and other elements
               Text(
-                'Selected Time: ${_selectedTime.format(context)}',
+                'Selected Date: ${widget.selectedDate.toLocal()}',
                 style: TextStyle(fontSize: 16, color: Colors.black), // Adjust text color if needed
               ),
+              SizedBox(height: 20),
+              if (_selectedTime != null) // Conditionally show time if selected
+                Text(
+                  'Selected Time: ${_selectedTime!.format(context)}',
+                  style: TextStyle(fontSize: 16, color: Colors.black), // Adjust text color if needed
+                ),
             ],
           ),
         ),

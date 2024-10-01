@@ -3,26 +3,33 @@ import 'calendar_page.dart';
 
 class AppointmentPage extends StatelessWidget {
   final List<Map<String, String>> choices = [
-    {'value': 'pasta', 'label': 'Pasta'},
-    {'value': 'teeth_clean', 'label': 'Teeth Cleaning'},
-    {'value': 'routine_cleanings', 'label': 'Routine Cleanings'},
-    {'value': 'teeth_whitening', 'label': 'Teeth Whitening'},
-    {'value': 'root_canals', 'label': 'Root Canals'},
-    {'value': 'extractions', 'label': 'Extractions'},
+    {'value': 'pasta', 'label': 'Pasta', 'price': '\$50'},
+    {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '\$70'},
+    {'value': 'braces', 'label': 'Braces', 'price': '\$40000'},
+    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '\$100'},
+    {'value': 'root_canals', 'label': 'Root Canals', 'price': '\$200'},
+    {'value': 'extractions', 'label': 'Extractions', 'price': '\$700'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40.0), // Adjust the height as needed
+        preferredSize: Size.fromHeight(60.0), // Adjust the height as needed
         child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/appbar.png'), // Your AppBar background image
+              fit: BoxFit.cover, // Adjust the image to cover the AppBar
+            ),
+          ),
           child: AppBar(
             backgroundColor: Colors.transparent, // Make AppBar background transparent
+            elevation: 0, // Remove the shadow line by setting elevation to 0
             title: Text(
               'Appointments',
               style: TextStyle(
-                color: Color.fromARGB(255, 9, 1, 18), // Set color to E5D9F2
+                color: Color(0xFFE5D9F2),
                 fontFamily: 'Roboto', // Set font to Roboto
               ),
             ),
@@ -45,10 +52,10 @@ class AppointmentPage extends StatelessWidget {
             child: GridView.builder(
               itemCount: choices.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,  // Change to 1 column for a single column layout
+                crossAxisCount: 1,  // Single column layout
                 crossAxisSpacing: 16.0, // Space between columns
                 mainAxisSpacing: 16.0,  // Space between rows
-                childAspectRatio: 3.5, // Adjust aspect ratio for button sizing
+                childAspectRatio: 4.0, // Adjust aspect ratio for button sizing
               ),
               itemBuilder: (context, index) {
                 return MouseRegion(
@@ -61,28 +68,35 @@ class AppointmentPage extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      width: 80, // Set width to 80 (smaller than before)
-                      height: 30, // Set height to 35 (smaller than before)
+                      width: 80, // Set width to 80
+                      height: 35, // Set height to 35
                       decoration: BoxDecoration(
-                        color: Color(0xFFE5D9F2), // Background color set to E5D9F2
-                        borderRadius: BorderRadius.circular(8.0), // Reduced corner radius
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 5.0,
-                            spreadRadius: 2.0,
-                          ),
-                        ],
+                        color: Color(0xFFE5D9F2), // Button background color
+                        borderRadius: BorderRadius.circular(8.0), // Rounded corners
                       ),
-                      child: Center(
-                        child: Text(
-                          choices[index]['label']!,
-                          style: TextStyle(
-                            color: Colors.black, // Change text color to ensure readability
-                            fontSize: 14.0,  // Reduced text size for compact design
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Label on the left side
+                            Text(
+                              choices[index]['label']!,
+                              style: TextStyle(
+                                color: Colors.black, // Ensure text is readable
+                                fontSize: 20.0,  // Text size
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            // Price on the right side
+                            Text(
+                              choices[index]['price']!,
+                              style: TextStyle(
+                                color: Colors.black, // Ensure text is readable
+                                fontSize: 18.0,  // Text size for price
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

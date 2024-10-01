@@ -33,50 +33,50 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80), // Adjust the height of the AppBar
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/appbar.png'), // Path to your background image
-              fit: BoxFit.cover, // Adjust this as needed (e.g., cover, contain, etc.)
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent, // Make AppBar transparent
-            title: Row(
-              children: [
-                GestureDetector(
-  onTap: () {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => ProfilePage()),
-    );
-  },
-  child: Row(
-    children: [
-      Padding(
-        padding: EdgeInsets.only(top: 10),
-        child: CircleAvatar(
-          backgroundImage: AssetImage('assets/pogisivenz.png'), // Profile image path
-          radius: 20,
-        ),
-      ),
-      SizedBox(width: 10),
-      Text(
-        'Hi, Harold Pogi',
-        style: TextStyle(color: Color(0xFFE5D9F2)), // Set the text color here
-      ),
-    ],
-  ),
-),
-
-
-              ],
-            ),
-          ),
-        ),
-      ),
+      appBar: _bottomNavIndex == 0 // Show AppBar only when on Home
+          ? PreferredSize(
+              preferredSize: Size.fromHeight(60), // Adjust the height of the AppBar
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/appbar.png'), // Path to your background image
+                    fit: BoxFit.cover, // Adjust this as needed (e.g., cover, contain, etc.)
+                  ),
+                ),
+                child: AppBar(
+                  backgroundColor: Colors.transparent, // Make AppBar transparent
+                  title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProfilePage()),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: CircleAvatar(
+                                backgroundImage: AssetImage('assets/pogisivenz.png'), // Profile image path
+                                radius: 20,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'Hi, Harold Pogi',
+                              style: TextStyle(color: Color(0xFFE5D9F2)), // Set the text color here
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          : null, // No AppBar for other pages
       body: Stack(
         children: [
           // Full screen background image

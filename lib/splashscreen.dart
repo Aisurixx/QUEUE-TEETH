@@ -13,7 +13,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive); // Hides status and navigation bars
 
-    Future.delayed(Duration(seconds:2), () {
+    Future.delayed(Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => SignInPage()),
       );
@@ -32,12 +32,17 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: const Color.fromARGB(255, 2, 2, 2),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/splash.png'), // Update with your image path
+            fit: BoxFit.cover, // Ensures the image covers the entire screen
+          ),
+        ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('a'), 
+              Image.asset('assets/logo.png'), // Update with your logo image path
               SizedBox(height: 20),
               CircularProgressIndicator(),
             ],
