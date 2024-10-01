@@ -3,6 +3,10 @@ import 'package:table_calendar/table_calendar.dart';
 import 'time_selection_page.dart'; // Make sure this path is correct
 
 class CalendarPage extends StatefulWidget {
+  final String serviceId; // Assuming you pass the service ID when navigating to CalendarPage
+
+  CalendarPage({required this.serviceId});
+
   @override
   _CalendarPageState createState() => _CalendarPageState();
 }
@@ -22,25 +26,25 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.0), // Adjust height as needed
+        preferredSize: Size.fromHeight(80.0),
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/appbar.png'), // Path to your image
-              fit: BoxFit.cover, // Cover the AppBar
+              image: AssetImage('assets/appbar.png'),
+              fit: BoxFit.cover,
             ),
           ),
           child: AppBar(
-            backgroundColor: Colors.transparent, // Make AppBar transparent
+            backgroundColor: Colors.transparent,
             title: Text(
               'Select Date',
               style: TextStyle(
-                color: Color(0xFFE5D9F2), // Change text color if needed
+                color: Color(0xFFE5D9F2),
               ),
             ),
-            centerTitle: true, // Center the title
+            centerTitle: true,
             iconTheme: IconThemeData(
-              color: Color(0xFFE5D9F2), // Set back button color
+              color: Color(0xFFE5D9F2),
             ),
           ),
         ),
@@ -48,8 +52,8 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Path to your image
-            fit: BoxFit.cover, // Cover the entire screen
+            image: AssetImage('assets/splash.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Padding(
@@ -66,10 +70,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
                   });
+
+                  // Navigate to TimeSelectionPage with service ID
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TimeSelectionPage(selectedDate: _selectedDay),
+                      builder: (context) => TimeSelectionPage(
+                        selectedDate: _selectedDay,
+                        serviceId: widget.serviceId, // Pass the service ID
+                      ),
                     ),
                   );
                 },
