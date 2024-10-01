@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'calendar_page.dart';
 
 class AppointmentPage extends StatelessWidget {
+  // List of services, now with IDs for each service
   final List<Map<String, String>> choices = [
-    {'value': 'pasta', 'label': 'Pasta'},
-    {'value': 'teeth_clean', 'label': 'Teeth Cleaning'},
-    {'value': 'routine_cleanings', 'label': 'Routine Cleanings'},
-    {'value': 'teeth_whitening', 'label': 'Teeth Whitening'},
-    {'value': 'root_canals', 'label': 'Root Canals'},
-    {'value': 'extractions', 'label': 'Extractions'},
+    {'value': 'pasta', 'label': 'Pasta', 'price': '\₱100', 'id': '1'},
+    {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '\₱50', 'id': '2'},
+    {'value': 'routine_cleanings', 'label': 'Routine Cleanings', 'price': '\₱80', 'id': '3'},
+    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '\₱150', 'id': '4'},
+    {'value': 'root_canals', 'label': 'Root Canals', 'price': '\₱500', 'id': '5'},
+    {'value': 'extractions', 'label': 'Extractions', 'price': '\₱300', 'id': '6'},
   ];
 
   @override
@@ -57,9 +58,12 @@ class AppointmentPage extends StatelessWidget {
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () {
+                      // Pass the selected service ID to the CalendarPage
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => CalendarPage()),
+                        MaterialPageRoute(
+                          builder: (context) => CalendarPage(serviceId: choices[index]['id']!),
+                        ),
                       );
                     },
                     child: Card(
@@ -73,14 +77,28 @@ class AppointmentPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         child: Center(
-                          child: Text(
-                            choices[index]['label']!,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16.0, // Increased text size
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                choices[index]['label']!,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16.0, // Increased text size
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 8.0),
+                              Text(
+                                choices[index]['price']!,
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14.0,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       ),
