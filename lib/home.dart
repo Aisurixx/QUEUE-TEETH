@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   final List<IconData> _iconList = [
     Icons.home_filled,
     Icons.add_rounded,
-    Icons.history_edu,
+    Icons.history,
   ];
 
   final List<String> _titleList = [
