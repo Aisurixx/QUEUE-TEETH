@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'time_selection_page.dart'; // Ensure this path is correct
+import 'time_selection_page.dart';
 
 class CalendarPage extends StatefulWidget {
+  final String service;
+  final String price;
+
+  CalendarPage({required this.service, required this.price});
+
   @override
   _CalendarPageState createState() => _CalendarPageState();
 }
@@ -22,25 +27,25 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0), // Adjust height as needed
+        preferredSize: Size.fromHeight(60.0),
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/appbar.png'), // Path to your image
-              fit: BoxFit.cover, // Cover the AppBar
+              image: AssetImage('assets/appbar.png'),
+              fit: BoxFit.cover,
             ),
           ),
           child: AppBar(
-            backgroundColor: Colors.transparent, // Make AppBar transparent
+            backgroundColor: Colors.transparent,
             title: Text(
               'Select Date',
               style: TextStyle(
-                color: Color(0xFFE5D9F2), // Change text color if needed
+                color: Color(0xFFE5D9F2),
               ),
             ),
-            centerTitle: true, // Center the title
+            centerTitle: true,
             iconTheme: IconThemeData(
-              color: Color(0xFFE5D9F2), // Set back button color
+              color: Color(0xFFE5D9F2),
             ),
           ),
         ),
@@ -48,19 +53,18 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Path to your image
-            fit: BoxFit.cover, // Cover the entire screen
+            image: AssetImage('assets/splash.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Add a translucent container for better visibility of the calendar
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8), // White background with transparency
-                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: TableCalendar(
                   firstDay: DateTime.utc(2020, 1, 1),
@@ -75,17 +79,21 @@ class _CalendarPageState extends State<CalendarPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TimeSelectionPage(selectedDate: _selectedDay),
+                        builder: (context) => TimeSelectionPage(
+                          selectedDate: _selectedDay,
+                          service: widget.service,
+                          price: widget.price,
+                        ),
                       ),
                     );
                   },
                   calendarStyle: CalendarStyle(
                     selectedDecoration: BoxDecoration(
-                      color: Colors.blue, // Change the selected date color
+                      color: Colors.blue,
                       shape: BoxShape.circle,
                     ),
                     todayDecoration: BoxDecoration(
-                      color: Colors.green, // Change today's date color
+                      color: Colors.green,
                       shape: BoxShape.circle,
                     ),
                     defaultDecoration: BoxDecoration(
@@ -93,12 +101,12 @@ class _CalendarPageState extends State<CalendarPage> {
                     ),
                   ),
                   headerStyle: HeaderStyle(
-                    formatButtonVisible: false, // Hide format button
-                    titleCentered: true, // Center the title
-                    leftChevronVisible: true, // Show left navigation button
-                    rightChevronVisible: true, // Show right navigation button
-                    leftChevronIcon: Icon(Icons.chevron_left, color: Color.fromARGB(255, 15, 14, 16)), // Customize left icon
-                    rightChevronIcon: Icon(Icons.chevron_right, color: Color.fromARGB(255, 15, 14, 16)), // Customize right icon
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                    leftChevronVisible: true,
+                    rightChevronVisible: true,
+                    leftChevronIcon: Icon(Icons.chevron_left, color: Color.fromARGB(255, 15, 14, 16)),
+                    rightChevronIcon: Icon(Icons.chevron_right, color: Color.fromARGB(255, 15, 14, 16)),
                   ),
                 ),
               ),
