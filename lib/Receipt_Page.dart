@@ -1,60 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // For making HTTP requests
-import 'dart:convert'; // For JSON encoding
 
-class ReceiptPage extends StatefulWidget {
-  final String bookingId;
+class ReceiptPage extends StatelessWidget {
+  final String service;
+  final DateTime date;
+  final TimeOfDay time;
+  final String price;
 
-  ReceiptPage({required this.bookingId});
-
-  @override
-  _ReceiptPageState createState() => _ReceiptPageState();
-}
-
-class _ReceiptPageState extends State<ReceiptPage> {
-  Map<String, dynamic>? receipt;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchReceipt();
-  }
-
-  Future<void> fetchReceipt() async {
-    final receiptUrl = Uri.parse('http://127.0.0.1:8000/api/bookings/{id}/receipt'); 
-    
-    final response = await http.get(receiptUrl);
-
-    if (response.statusCode == 200) {
-      setState(() {
-        receipt = jsonDecode(response.body);
-      });
-    } else {
-      // Handle error
-      print('Failed to fetch receipt: ${response.body}');
-    }
-  }
+  ReceiptPage({required this.service, required this.date, required this.time, required this.price});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Receipt'),
+        title: Text("Receipt"),
       ),
-      body: receipt == null
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Service: ${receipt!['service']}', style: TextStyle(fontSize: 18)),
-                  Text('Price: ${receipt!['price']}', style: TextStyle(fontSize: 18)),
-                  Text('Total Price: ${receipt!['total_price']}', style: TextStyle(fontSize: 18)),
-                  Text('Booking Time: ${receipt!['booking_time']}', style: TextStyle(fontSize: 18)),
-                ],
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Service: $service", style: TextStyle(fontSize: 20)),
+              Text("Date: ${date.toLocal().toIso8601String().split('T')[0]}", style: TextStyle(fontSize: 20)),
+              Text("Time: ${time.format(context)}", style: TextStyle(fontSize: 20)),
+              Text("Price: $price", style: TextStyle(fontSize: 20)),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                child: Text("Back to Home"),
               ),
-            ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

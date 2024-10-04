@@ -15,85 +15,82 @@ class AppointmentPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0), // Adjust the height as needed
+        preferredSize: Size.fromHeight(60.0),
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/appbar.png'), // Your AppBar background image
-              fit: BoxFit.cover, // Adjust the image to cover the AppBar
+              fit: BoxFit.cover,
             ),
           ),
           child: AppBar(
-            backgroundColor: Colors.transparent, // Make AppBar background transparent
-            elevation: 0, // Remove the shadow line by setting elevation to 0
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             title: Text(
               'Appointments',
               style: TextStyle(
                 color: Color(0xFFE5D9F2),
-                fontFamily: 'Roboto', // Set font to Roboto
+                fontFamily: 'Roboto',
               ),
             ),
-            centerTitle: true, // Center the title
+            centerTitle: true,
           ),
         ),
       ),
       body: Stack(
         children: [
-          // Background Image
           Positioned.fill(
             child: Image.asset(
               'assets/splash.png', // Ensure this path is correct
               fit: BoxFit.cover,
             ),
           ),
-          // Main Content (Grid of Appointment Choices)
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: GridView.builder(
               itemCount: choices.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,  // Single column layout
-                crossAxisSpacing: 16.0, // Space between columns
-                mainAxisSpacing: 16.0,  // Space between rows
-                childAspectRatio: 4.0, // Adjust aspect ratio for button sizing
+                crossAxisCount: 1,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+                childAspectRatio: 4.0,
               ),
               itemBuilder: (context, index) {
                 return MouseRegion(
-                  cursor: SystemMouseCursors.click,  // Show click cursor
+                  cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () {
+                      final service = choices[index]['label']!;
+                      final price = choices[index]['price']!;
+                      
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => CalendarPage()),
+                        MaterialPageRoute(builder: (context) => CalendarPage(service: service, price: price)),
                       );
                     },
                     child: Container(
-                      width: 80, // Set width to 80
-                      height: 35, // Set height to 35
                       decoration: BoxDecoration(
-                        color: Color(0xFFE5D9F2), // Button background color
-                        borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                        color: Color(0xFFE5D9F2),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Label on the left side
                             Text(
                               choices[index]['label']!,
                               style: TextStyle(
-                                color: Colors.black, // Ensure text is readable
-                                fontSize: 20.0,  // Text size
+                                color: Colors.black,
+                                fontSize: 20.0,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            // Price on the right side
                             Text(
                               choices[index]['price']!,
                               style: TextStyle(
-                                color: Colors.black, // Ensure text is readable
-                                fontSize: 18.0,  // Text size for price
+                                color: Colors.black,
+                                fontSize: 18.0,
                               ),
                             ),
                           ],

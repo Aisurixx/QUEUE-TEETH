@@ -1,16 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'receipt_page.dart';
+import 'package:intl/intl.dart';
 
 class TimeSelectionPage extends StatefulWidget {
   final DateTime selectedDate;
+  final String service;
+  final String price;
 
-  TimeSelectionPage({required this.selectedDate});
+  TimeSelectionPage({
+    required this.selectedDate,
+    required this.service,
+    required this.price,
+  });
 
   @override
   _TimeSelectionPageState createState() => _TimeSelectionPageState();
 }
 
 class _TimeSelectionPageState extends State<TimeSelectionPage> {
-  TimeOfDay? _selectedTime; // Make _selectedTime nullable
+  TimeOfDay? _selectedTime;
+  bool _isLoading = false; // State variable for loading
+
+  Future<void> _saveAppointment() async {
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select a time.")),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    final response = await Supabase.instance.client
+        .from('appointments')
+        .insert({
+          'service': widget.service,
+          'date': DateFormat('yyyy-MM-dd').format(widget.selectedDate),
+          'time': _selectedTime!.format(context),
+          'price': double.tryParse(widget.price.replaceAll('\$', '')), // Handle parsing safely
+        })
+        .execute();
+
+    // Check if the response is successful
+    if (response.status == 201) { // Check for success status (201 Created)
+      // Navigate to receipt page
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReceiptPage(
+            service: widget.service,
+            date: widget.selectedDate,
+            time: _selectedTime!,
+            price: widget.price,
+          ),
+        ),
+      );
+    } else {
+      // Handle error (e.g., show a message)
+      final errorMessage = response.error?.message ?? 'Unknown error';
+      print("Error: $errorMessage");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $errorMessage")),
+      );
+    }
+
+    setState(() {
+      _isLoading = false; // Stop loading
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +87,16 @@ class _TimeSelectionPageState extends State<TimeSelectionPage> {
           child: AppBar(
             title: Text(
               'Select Time',
-              textAlign: TextAlign.center, // Center the text
-              style: TextStyle(color: Color(0xFFE5D9F2)), // Set title text color
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFFE5D9F2)),
             ),
-            backgroundColor: Colors.transparent, // Make AppBar transparent
-            elevation: 0, // Remove shadow
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Color(0xFFE5D9F2)), // Set back button color
+              icon: Icon(Icons.arrow_back, color: Color(0xFFE5D9F2)),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            toolbarHeight: 80.0, // Ensure the AppBar height is as defined
+            toolbarHeight: 80.0,
           ),
         ),
       ),
@@ -45,7 +105,7 @@ class _TimeSelectionPageState extends State<TimeSelectionPage> {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Update this to your image path
+            image: AssetImage('assets/splash.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -66,27 +126,38 @@ class _TimeSelectionPageState extends State<TimeSelectionPage> {
                     });
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40), // Increase button size
-                  textStyle: TextStyle(fontSize: 18), // Increase font size
-                ),
                 child: Text('Pick Time'),
               ),
-              SizedBox(height: 30), // Space between button and other elements
+              SizedBox(height: 30),
               Text(
-                'Selected Date: ${widget.selectedDate.toLocal()}',
-                style: TextStyle(fontSize: 16, color: Colors.black), // Adjust text color if needed
+                'Selected Date: ${DateFormat('yyyy-MM-dd').format(widget.selectedDate)}',
+                style: TextStyle(fontSize: 16, color: Colors.black),
               ),
               SizedBox(height: 20),
-              if (_selectedTime != null) // Conditionally show time if selected
+              if (_selectedTime != null)
                 Text(
                   'Selected Time: ${_selectedTime!.format(context)}',
-                  style: TextStyle(fontSize: 16, color: Colors.black), // Adjust text color if needed
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _selectedTime == null ? null : () async {
+                  await _saveAppointment();
+                },
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      )
+                    : Text("Confirm Appointment"),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+extension on PostgrestResponse {
+  get error => null;
 }
