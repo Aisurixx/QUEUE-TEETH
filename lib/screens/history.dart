@@ -1,45 +1,57 @@
 import 'package:flutter/material.dart';
-import 'dart:ui'; // Import this to use BackdropFilter
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:ui'; // Import for BackdropFilter
 
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Example data: list of patients and their appointments
-    final List<Map<String, String>> patientHistory = [
-      {
-        'name': 'Harold',
-        'appointment': 'Kumasta',
-        'date': '2024-02-14',
-        'time': '1:00 AM'
-      },
-      {
-        'name': 'Joden',
-        'appointment': 'Kinasta',
-        'date': '2024-09-30',
-        'time': '1:30 PM'
-      },
-      {
-        'name': 'Venz',
-        'appointment': 'Kumagat',
-        'date': '2024-10-01',
-        'time': '11:45 AM'
-      },
-       {
-        'name': 'Paul',
-        'appointment': 'Kinagat',
-        'date': '2024-10-01',
-        'time': '12:45 AM'
-      },
-       {
-        'name': 'Saymon',
-        'appointment': 'Kinain',
-        'date': '2024-12-25',
-        'time': '9:45 AM'
-      },
-    ];
+  _HistoryPageState createState() => _HistoryPageState();
+}
 
+class _HistoryPageState extends State<HistoryPage> {
+  final SupabaseClient supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> patientHistory = [];  // Update to dynamic
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPatientHistory();
+  }
+
+  Future<void> _fetchPatientHistory() async {
+    // Get the current authenticated user
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      // If the user is not authenticated, return or show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User is not authenticated.")),
+      );
+      return;
+    }
+
+    // Fetch appointments for the authenticated user
+    final response = await supabase
+        .from('appointments')
+        .select('service, date, time, price')
+        .eq('user_id', user.id) // Filter by user_id
+        .execute();
+
+    if (response.error == null) {
+      setState(() {
+        patientHistory = (response.data as List).cast<Map<String, dynamic>>(); // Update to cast to List<Map<String, dynamic>>
+      });
+    } else {
+      print('Error fetching patient history: ${response.error!.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching history: ${response.error!.message}')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -98,10 +110,9 @@ class HistoryPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: const [
                           Text(
-                            'These are the patients who appointed',
+                            'Services and Appointments',
                             style: TextStyle(
-                              color:
-                              Color(0xFFE5D9F2),
+                              color: Color(0xFFE5D9F2),
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Roboto',
@@ -135,35 +146,33 @@ class HistoryPage extends StatelessWidget {
                       child: ListTile(
                         leading: const Icon(Icons.account_circle, size: 40.0, color: Colors.white),
                         title: Text(
-                          patient['name']!,
+                          patient['service'].toString(),  // Use .toString() for dynamic values
                           style: const TextStyle(
                             color: Colors.black87,
                             fontFamily: 'Roboto',
                           ),
                         ),
-                        subtitle: Text(
-                          patient['appointment']!,
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontFamily: 'Roboto',
-                          ),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              patient['date']!,
+                              'Date: ${patient['date'].toString()}',  // Use .toString() for dynamic values
                               style: const TextStyle(
-                                color: Colors.black87,
-                                fontSize: 16,
+                                color: Colors.black54,
                                 fontFamily: 'Roboto',
                               ),
                             ),
                             Text(
-                              patient['time']!,
+                              'Time: ${patient['time'].toString()}',  // Use .toString() for dynamic values
                               style: const TextStyle(
                                 color: Colors.black54,
-                                fontSize: 14,
+                                fontFamily: 'Roboto',
+                              ),
+                            ),
+                            Text(
+                              'Price: ${patient['price'].toString()}',  // Use .toString() for dynamic values
+                              style: const TextStyle(
+                                color: Colors.black54,
                                 fontFamily: 'Roboto',
                               ),
                             ),
@@ -180,4 +189,8 @@ class HistoryPage extends StatelessWidget {
       ),
     );
   }
+}
+
+extension on PostgrestResponse {
+  get error => null;
 }

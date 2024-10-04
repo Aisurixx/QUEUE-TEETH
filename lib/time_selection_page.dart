@@ -34,13 +34,28 @@ class _TimeSelectionPageState extends State<TimeSelectionPage> {
       _isLoading = true; // Start loading
     });
 
+    // Get the current authenticated user
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User is not authenticated.")),
+      );
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
+      return;
+    }
+
+    // Save appointment with user_id in Supabase
     final response = await Supabase.instance.client
         .from('appointments')
         .insert({
           'service': widget.service,
           'date': DateFormat('yyyy-MM-dd').format(widget.selectedDate),
           'time': _selectedTime!.format(context),
-          'price': double.tryParse(widget.price.replaceAll('\$', '')), // Handle parsing safely
+          'price': double.tryParse(widget.price.replaceAll('\$', '')), // Safely parse price
+          'user_id': user.id,  // Include user_id for this appointment
         })
         .execute();
 
