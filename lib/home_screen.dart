@@ -6,35 +6,31 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false, // Prevents system back button navigation
+      onWillPop: () async => false,
       child: Scaffold(
-        extendBodyBehindAppBar: true, // Ensures the background extends behind the AppBar
-        extendBody: true, // Ensures the background extends behind the navigation bar
+        extendBodyBehindAppBar: true,
+        extendBody: true,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80.0), // Set height of AppBar
-          child: Container(
-            child: AppBar(
-              title: const Text(''),
-              automaticallyImplyLeading: false, // Removes the back button
-              backgroundColor: Colors.transparent, // Make AppBar transparent to show background
-              elevation: 0, // Remove shadow under the AppBar
-            ),
+          preferredSize: const Size.fromHeight(60.0),
+          child: AppBar(
+            title: const Text(''),
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
         ),
         body: Stack(
           children: [
-            // Fullscreen background container
             Container(
               width: double.infinity,
               height: double.infinity,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/splash.png'), // Replace with your background image path
-                  fit: BoxFit.cover, // Ensure the image covers the entire screen
+                  image: AssetImage('assets/splash.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            // Main content
             SafeArea(
               child: buildFrontieSection(context),
             ),
@@ -45,30 +41,72 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildFrontieSection(BuildContext context) {
+    // Use MediaQuery to set a dynamic height
+    double containerHeight = MediaQuery.of(context).size.height * 0.25; // 25% of screen height
+
     return Container(
       width: double.infinity,
+      height: containerHeight, // Use dynamic height
       padding: const EdgeInsets.symmetric(
         horizontal: 20.0,
         vertical: 12.0,
       ),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0), // Add horizontal margin for space on the sides
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            // Add colors to the gradient if needed
+            Color(0xFFE5D9F2), // Lighter color at the top
+            Color(0xFFD1C4E9), // Darker color for more contrast
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(30.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2), // Soft shadow for depth
+            spreadRadius: 2,
+            blurRadius: 6,
+            offset: Offset(0, 4),
+          ),
+        ],
+        borderRadius: BorderRadius.circular(10.0),
       ),
-      child: const Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-            ),
+          Row(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  'assets/pogisivenz.png',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Dr. Star ng pasko ko',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      'Status: Online',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

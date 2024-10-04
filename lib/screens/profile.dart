@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:queueteeth/loading_screen.dart';
-import 'package:queueteeth/splashscreen.dart'; // Import your loading_screen.dart file
+import 'package:queueteeth/home.dart';
+import 'package:queueteeth/login.dart';
 
 class ProfilePage extends StatelessWidget {
   final String imagePath = 'assets/pogisivenz.png';
-  final String userName = 'MEOWMEOWMEOW'; 
+  final String userName = 'Harold nag LULU'; 
   final String backgroundImagePath = 'assets/splash.png';
   final String appBarBackgroundImagePath = 'assets/appbar.png'; // AppBar background image path
 
@@ -12,7 +12,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100.0), // Set height of AppBar
+        preferredSize: Size.fromHeight(60.0), // Set height of AppBar
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -25,7 +25,10 @@ class ProfilePage extends StatelessWidget {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Color(0xFFE5D9F2)), // Set back button color
               onPressed: () {
-                Navigator.pop(context); // Navigate back to the previous screen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()), // Navigate directly to the home screen
+                );
               },
             ),
             backgroundColor: Colors.transparent, // Make app bar background transparent
@@ -34,6 +37,8 @@ class ProfilePage extends StatelessWidget {
         ),
       ),
       body: Container(
+        width: double.infinity, // Fill the width of the screen
+        height: double.infinity, // Fill the height of the screen
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage(backgroundImagePath), // Background image for body
@@ -42,64 +47,50 @@ class ProfilePage extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Center( // Center the profile content
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                CircleAvatar(
-                  radius: 60.0,
-                  backgroundImage: AssetImage(imagePath),
-                  backgroundColor: Colors.grey[200],
-                ),
-                const SizedBox(height: 20),
+          child: Column( // Remove Center widget to align items to the top
+            mainAxisAlignment: MainAxisAlignment.start, // Align items to the top
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 40), // Add some space from the top
 
-                // User's Name
-                Text(
-                  userName,
-                  style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // Set text color for user's name
-                  ),
-                ),
-                const SizedBox(height: 10),
+              CircleAvatar(
+                radius: 60.0,
+                backgroundImage: AssetImage(imagePath),
+                backgroundColor: Colors.grey[200],
+              ),
+              const SizedBox(height: 20),
 
-                // Action Buttons (e.g., Edit Profile)
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement Edit Profile functionality
-                  },
-                  child: const Text('Edit Profile'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE5D9F2), // Button color
-                  ),
+              // User's Name
+              Text(
+                userName,
+                style: const TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // Set text color for user's name
                 ),
-                const SizedBox(height: 10),
+              ),
+              const SizedBox(height: 10),
 
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigate to loading_screen.dart
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => SplashScreen()), // Replace with your loading screen widget
-                    );
-                  },
-                  child: const Text('Logout'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE5D9F2), // Button color
-                  ),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to loading_screen.dart
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignInPage()), // Replace with your loading screen widget
+                  );
+                },
+                child: const Text('Logout'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFE5D9F2), // Button color
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
-
-// Replace this with the actual LoadingScreen widget from loading_screen.dart
 
 void main() {
   runApp(MaterialApp(

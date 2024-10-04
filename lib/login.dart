@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
 import 'dart:ui'; // Import for ImageFilter
 import 'home.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
-  Future<bool> signIn(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/auth/login'), // Update with your Laravel API URL
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
+  final SupabaseClient _client = Supabase.instance.client;
 
-    return response.statusCode == 200; // Return true for successful login
+  Future<bool> signIn(String email, String password) async {
+    try {
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      return response.user != null;
+    } catch (error) {
+      print('SignIn Error: $error');
+      return false;
+    }
+  }
+
+  Future<void> signOut() async {
+    await _client.auth.signOut();
   }
 }
+
 
 class SignInPage extends StatefulWidget {
   @override
@@ -117,7 +127,6 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    // Get the height of the keyboard
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
@@ -208,9 +217,7 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                                   prefixIcon: Icon(Icons.lock),
                                   suffixIcon: IconButton(
                                     icon: Icon(
-                                      _passwordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
+                                      _passwordVisible ? Icons.visibility : Icons.visibility_off,
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -310,7 +317,6 @@ class _SignInPageState extends State<SignInPage> with SingleTickerProviderStateM
                 ),
               ),
           ],
-
         ),
       ),
     );

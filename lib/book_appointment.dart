@@ -2,104 +2,101 @@ import 'package:flutter/material.dart';
 import 'calendar_page.dart';
 
 class AppointmentPage extends StatelessWidget {
-  // List of services, now with IDs for each service
   final List<Map<String, String>> choices = [
-    {'value': 'pasta', 'label': 'Pasta', 'price': '\₱100', 'id': '1'},
-    {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '\₱50', 'id': '2'},
-    {'value': 'routine_cleanings', 'label': 'Routine Cleanings', 'price': '\₱80', 'id': '3'},
-    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '\₱150', 'id': '4'},
-    {'value': 'root_canals', 'label': 'Root Canals', 'price': '\₱500', 'id': '5'},
-    {'value': 'extractions', 'label': 'Extractions', 'price': '\₱300', 'id': '6'},
+    {'value': 'pasta', 'label': 'Pasta', 'price': '\$50'},
+    {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '\$70'},
+    {'value': 'braces', 'label': 'Braces', 'price': '\$40000'},
+    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '\$100'},
+    {'value': 'root_canals', 'label': 'Root Canals', 'price': '\$200'},
+    {'value': 'extractions', 'label': 'Extractions', 'price': '\$700'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
+        preferredSize: Size.fromHeight(60.0), // Adjust the height as needed
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [Colors.blue, Colors.purple]),
+            image: DecorationImage(
+              image: AssetImage('assets/appbar.png'), // Your AppBar background image
+              fit: BoxFit.cover, // Adjust the image to cover the AppBar
+            ),
           ),
           child: AppBar(
+            backgroundColor: Colors.transparent, // Make AppBar background transparent
+            elevation: 0, // Remove the shadow line by setting elevation to 0
             title: Text(
               'Appointments',
               style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Roboto',
+                color: Color(0xFFE5D9F2),
+                fontFamily: 'Roboto', // Set font to Roboto
               ),
             ),
-            centerTitle: true,
-            backgroundColor: Colors.transparent, // Make AppBar background transparent
-            elevation: 0, // Remove the AppBar shadow
+            centerTitle: true, // Center the title
           ),
         ),
       ),
       body: Stack(
         children: [
+          // Background Image
           Positioned.fill(
             child: Image.asset(
-              'assets/splash.png',
+              'assets/splash.png', // Ensure this path is correct
               fit: BoxFit.cover,
             ),
           ),
+          // Main Content (Grid of Appointment Choices)
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: GridView.builder(
               itemCount: choices.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.of(context).size.width > 600 ? 2 : 1, // Responsive layout
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 3.5,
+                crossAxisCount: 1,  // Single column layout
+                crossAxisSpacing: 16.0, // Space between columns
+                mainAxisSpacing: 16.0,  // Space between rows
+                childAspectRatio: 4.0, // Adjust aspect ratio for button sizing
               ),
               itemBuilder: (context, index) {
                 return MouseRegion(
-                  cursor: SystemMouseCursors.click,
+                  cursor: SystemMouseCursors.click,  // Show click cursor
                   child: GestureDetector(
                     onTap: () {
-                      // Pass the selected service ID to the CalendarPage
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => CalendarPage(serviceId: choices[index]['id']!),
-                        ),
+                        MaterialPageRoute(builder: (context) => CalendarPage()),
                       );
                     },
-                    child: Card(
-                      elevation: 4.0, // Added elevation for depth
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
+                    child: Container(
+                      width: 80, // Set width to 80
+                      height: 35, // Set height to 35
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE5D9F2), // Button background color
+                        borderRadius: BorderRadius.circular(8.0), // Rounded corners
                       ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFE5D9F2),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                choices[index]['label']!,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16.0, // Increased text size
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Label on the left side
+                            Text(
+                              choices[index]['label']!,
+                              style: TextStyle(
+                                color: Colors.black, // Ensure text is readable
+                                fontSize: 20.0,  // Text size
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(height: 8.0),
-                              Text(
-                                choices[index]['price']!,
-                                style: TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14.0,
-                                ),
-                                textAlign: TextAlign.center,
+                            ),
+                            // Price on the right side
+                            Text(
+                              choices[index]['price']!,
+                              style: TextStyle(
+                                color: Colors.black, // Ensure text is readable
+                                fontSize: 18.0,  // Text size for price
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
