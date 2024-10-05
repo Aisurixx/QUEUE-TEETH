@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screens/profile.dart'; // Ensure ProfilePage is defined in profile.dart
-import 'home_screen.dart'; // Ensure HomeScreen is defined in home_screen.dart
-import 'book_appointment.dart'; // Ensure AppointmentPage is defined in book_appointment.dart
-import 'screens/history.dart'; // Ensure HistoryPage is defined in history.dart
+import 'screens/profile.dart';
+import 'home_screen.dart';
+import 'book_appointment.dart';
+import 'screens/history.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -30,128 +30,107 @@ class _HomePageState extends State<HomePage> {
     'History',
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _bottomNavIndex == 0 // Show AppBar only when on Home
-          ? PreferredSize(
-              preferredSize: Size.fromHeight(60), // Adjust the height of the AppBar
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/appbar.png'), // Path to your background image
-                    fit: BoxFit.cover, // Adjust this as needed (e.g., cover, contain, etc.)
-                  ),
-                ),
-                child: AppBar(
-                  backgroundColor: Colors.transparent, // Make AppBar transparent
-                  title: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => ProfilePage()),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 10),
-                              child: CircleAvatar(
-                                backgroundImage: AssetImage('assets/pogisivenz.png'), // Profile image path
-                                radius: 20,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              'Hi, Harold Pogi',
-                              style: TextStyle(color: Color(0xFFE5D9F2)), // Set the text color here
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+  PreferredSizeWidget? _buildAppBar() {
+    if (_bottomNavIndex == 0) {
+      return PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/appbar.png'),
+                fit: BoxFit.cover,
               ),
-            )
-          : null, // No AppBar for other pages
-      body: Stack(
-        children: [
-          // Full screen background image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/splash.png', // Background image path
-              fit: BoxFit.cover,
             ),
           ),
-          // Main content displaying the current page
-          Positioned.fill(
-            child: _pages[_bottomNavIndex],
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
+            child: Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage('assets/pogisivenz.png'),
+                    radius: 20,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Hi, Harold Pogi',
+                  style: TextStyle(color: Color(0xFFE5D9F2)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    return null;
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(100)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 5,
+            blurRadius: 7,
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(bottom: 30.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(50.0),
-            bottom: Radius.circular(50.0),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8.0,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(30.0),
-            bottom: Radius.circular(30.0),
-          ),
-          child: BottomNavigationBar(
-            currentIndex: _bottomNavIndex,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  _iconList[0],
-                  color: _bottomNavIndex == 0
-                      ? const Color.fromARGB(255, 116, 23, 133)
-                      : Colors.black,
-                ),
-                label: _titleList[0],
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  _iconList[1],
-                  color: _bottomNavIndex == 1
-                      ? const Color.fromARGB(255, 116, 23, 133)
-                      : Colors.black,
-                ),
-                label: _titleList[1],
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  _iconList[2],
-                  color: _bottomNavIndex == 2
-                      ? const Color.fromARGB(255, 116, 23, 133)
-                      : Colors.black,
-                ),
-                label: _titleList[2],
-              ),
-            ],
-            onTap: (index) {
-              setState(() {
-                _bottomNavIndex = index;
-              });
-            },
-          ),
-        ),
+      child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _bottomNavIndex,
+        selectedItemColor: const Color.fromARGB(255, 116, 23, 133),
+        unselectedItemColor: Colors.black,
+        items: _iconList.asMap().entries.map((entry) {
+          int idx = entry.key;
+          IconData icon = entry.value;
+          return BottomNavigationBarItem(
+            icon: Icon(icon),
+            label: _titleList[idx],
+          );
+        }).toList(),
+        onTap: (index) {
+          setState(() {
+            _bottomNavIndex = index;
+          });
+        },
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/splash.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: Duration(milliseconds: 300),
+              child: _pages[_bottomNavIndex],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 }
