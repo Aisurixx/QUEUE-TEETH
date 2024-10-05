@@ -31,11 +31,12 @@ class _HistoryPageState extends State<HistoryPage> {
       return;
     }
 
-    // Fetch appointments for the authenticated user
+    // Fetch appointments for the authenticated user and order by date (newest first)
     final response = await supabase
         .from('appointments')
         .select('service, date, time, price')
         .eq('user_id', user.id) // Filter by user_id
+        .order('date', ascending: false)  // Sort by date in descending order
         .execute();
 
     if (response.error == null) {
