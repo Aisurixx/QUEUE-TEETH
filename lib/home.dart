@@ -17,17 +17,17 @@ class _HomePageState extends State<HomePage> {
   final List<FloatingBottomNavItem> bottomNavItems = const [
     FloatingBottomNavItem(
       inactiveIcon: Icon(Icons.home_outlined, color: Colors.black),
-      activeIcon: Icon(Icons.home, color: Colors.black),
+      activeIcon: Icon(Icons.home, color: Colors.purple), // Set active icon color to purple
       label: "Home",
     ),
     FloatingBottomNavItem(
       inactiveIcon: Icon(Icons.add_circle_outline, color: Colors.black),
-      activeIcon: Icon(Icons.add_circle, color: Colors.black),
-      label: "Add",
+      activeIcon: Icon(Icons.add_circle, color: Colors.purple), // Set active icon color to purple
+      label: "Appointments",
     ),
     FloatingBottomNavItem(
       inactiveIcon: Icon(Icons.history, color: Colors.black),
-      activeIcon: Icon(Icons.history, color: Colors.black),
+      activeIcon: Icon(Icons.history, color: Colors.purple), // Set active icon color to purple
       label: "History",
     ),
   ];
@@ -36,7 +36,6 @@ class _HomePageState extends State<HomePage> {
     HomeScreen(),
     AppointmentPage(),
     HistoryPage(),
-    // Removed ProfilePage
   ];
 
   PreferredSizeWidget? _buildAppBar() {
@@ -52,46 +51,36 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        title: GestureDetector(
-          onTap: () {
-            // You can redirect to another page or handle the tap
-            // For example, navigate to the HomeScreen
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-            );
-          },
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 10),
-                child: CircleAvatar(
-                  backgroundImage: AssetImage('assets/pogisivenz.png'),
-                  radius: 20,
-                ),
+        title: Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: CircleAvatar(
+                backgroundImage: AssetImage('assets/pogisivenz.png'),
+                radius: 20,
               ),
-              SizedBox(width: 10),
-              Text(
-                'Hi, Harold Pogi',
-                style: TextStyle(color: Color(0xFFE5D9F2)),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(width: 10),
+            Text(
+              'Hi, Harold Pogi',
+              style: TextStyle(color: Color(0xFFE5D9F2)),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _onItemTapped(int index) {
+  void _onBottomNavTapped(int index) {
     setState(() {
-      _bottomNavIndex = index; // Update the index when an item is tapped
+      _bottomNavIndex = index; // Update the index
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Make Scaffold background transparent
+      backgroundColor: Colors.transparent,
       appBar: _buildAppBar(),
       body: Stack(
         children: [
@@ -109,20 +98,34 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: FloatingBottomNavBar(
-        pages: _pages,
-        items: bottomNavItems,
-        initialPageIndex: _bottomNavIndex,
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        bottomPadding: 10,
-        elevation: 0,
-        radius: 20,
-        width: 300,
-        height: 65,
-        // Ensure that _onItemTapped updates the index
-   // Add this line to ensure proper tap handling
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Theme(
+            // Apply theme for active/inactive label colors
+            data: Theme.of(context).copyWith(
+              textTheme: Theme.of(context).textTheme.copyWith(
+                    bodySmall: TextStyle(
+                      color: const Color.fromARGB(255, 6, 0, 0), // Text color for active items
+                    ),
+                  ),
+            ),
+            child: FloatingBottomNavBar(
+              pages: _pages,
+              items: bottomNavItems,
+              initialPageIndex: _bottomNavIndex,
+              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              bottomPadding: 5,
+              elevation: 0,
+              radius: 20,
+              width: MediaQuery.of(context).size.width - 20,
+              height: 65,
+          
+            ),
+          ),
+        ),
       ),
-      resizeToAvoidBottomInset: true, // Add this property
+      resizeToAvoidBottomInset: true,
     );
   }
 }
