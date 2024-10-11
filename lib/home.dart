@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simple_floating_bottom_nav_bar/floating_bottom_nav_bar.dart';
 import 'package:simple_floating_bottom_nav_bar/floating_item.dart';
+import 'screens/profile.dart'; // Add this line to import the profile page
 
 import 'home_screen.dart';
 import 'book_appointment.dart';
@@ -15,28 +16,36 @@ class _HomePageState extends State<HomePage> {
   int _bottomNavIndex = 0;
 
   final List<FloatingBottomNavItem> bottomNavItems = const [
-    FloatingBottomNavItem(
-      inactiveIcon: Icon(Icons.home_outlined, color: Colors.black),
-      activeIcon: Icon(Icons.home, color: Colors.purple), // Set active icon color to purple
-      label: "Home",
-    ),
-    FloatingBottomNavItem(
-      inactiveIcon: Icon(Icons.add_circle_outline, color: Colors.black),
-      activeIcon: Icon(Icons.add_circle, color: Colors.purple), // Set active icon color to purple
-      label: "Appointments",
-    ),
-    FloatingBottomNavItem(
-      inactiveIcon: Icon(Icons.history, color: Colors.black),
-      activeIcon: Icon(Icons.history, color: Colors.purple), // Set active icon color to purple
-      label: "History",
-    ),
-  ];
+  FloatingBottomNavItem(
+    inactiveIcon: Icon(Icons.home_outlined, color: Colors.black),
+    activeIcon: Icon(Icons.home, color: Colors.purple),
+    label: "Home",
+  ),
+  FloatingBottomNavItem(
+    inactiveIcon: Icon(Icons.add_circle_outline, color: Colors.black),
+    activeIcon: Icon(Icons.add_circle, color: Colors.purple),
+    label: "Appointments",
+  ),
+  FloatingBottomNavItem(
+    inactiveIcon: Icon(Icons.history, color: Colors.black),
+    activeIcon: Icon(Icons.history, color: Colors.purple),
+    label: "History",
+  ),
+  FloatingBottomNavItem(
+    inactiveIcon: Icon(Icons.person_outline, color: Colors.black),
+    activeIcon: Icon(Icons.person, color: Colors.purple), // Profile icon
+    label: "Profile",
+  ),
+];
+
 
   final List<Widget> _pages = [
-    HomeScreen(),
-    AppointmentPage(),
-    HistoryPage(),
-  ];
+  HomeScreen(),
+  AppointmentPage(),
+  HistoryPage(),
+  ProfilePage(), // Add ProfilePage here
+];
+
 
   PreferredSizeWidget? _buildAppBar() {
     return PreferredSize(
@@ -117,7 +126,7 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: const Color.fromARGB(255, 255, 255, 255),
               bottomPadding: 5,
               elevation: 0,
-              radius: 20,
+              radius: 30,
               width: MediaQuery.of(context).size.width - 20,
               height: 65,
           
