@@ -16,36 +16,34 @@ class _HomePageState extends State<HomePage> {
   int _bottomNavIndex = 0;
 
   final List<FloatingBottomNavItem> bottomNavItems = const [
-  FloatingBottomNavItem(
-    inactiveIcon: Icon(Icons.home_outlined, color: Colors.black),
-    activeIcon: Icon(Icons.home, color: Colors.purple),
-    label: "Home",
-  ),
-  FloatingBottomNavItem(
-    inactiveIcon: Icon(Icons.add_circle_outline, color: Colors.black),
-    activeIcon: Icon(Icons.add_circle, color: Colors.purple),
-    label: "Appointments",
-  ),
-  FloatingBottomNavItem(
-    inactiveIcon: Icon(Icons.history, color: Colors.black),
-    activeIcon: Icon(Icons.history, color: Colors.purple),
-    label: "History",
-  ),
-  FloatingBottomNavItem(
-    inactiveIcon: Icon(Icons.person_outline, color: Colors.black),
-    activeIcon: Icon(Icons.person, color: Colors.purple), // Profile icon
-    label: "Profile",
-  ),
-];
-
+    FloatingBottomNavItem(
+      inactiveIcon: Icon(Icons.space_dashboard_outlined, color: Colors.black),
+      activeIcon: Icon(Icons.space_dashboard_rounded, color: Colors.purple),
+      label: "Home",
+    ),
+    FloatingBottomNavItem(
+      inactiveIcon: Icon(Icons.event_available_outlined, color: Colors.black),
+      activeIcon: Icon(Icons.event_available_rounded, color: Colors.purple),
+      label: "Appointments",
+    ),
+    FloatingBottomNavItem(
+      inactiveIcon: Icon(Icons.history_toggle_off_outlined, color: Colors.black),
+      activeIcon: Icon(Icons.history_toggle_off_rounded, color: Colors.purple),
+      label: "History",
+    ),
+    FloatingBottomNavItem(
+      inactiveIcon: Icon(Icons.person_2_outlined, color: Colors.black),
+      activeIcon: Icon(Icons.person_2_rounded, color: Colors.purple),
+      label: "Profile",
+    ),
+  ];
 
   final List<Widget> _pages = [
-  HomeScreen(),
-  AppointmentPage(),
-  HistoryPage(),
-  ProfilePage(), // Add ProfilePage here
-];
-
+    HomeScreen(),
+    AppointmentPage(),
+    HistoryPage(),
+    ProfilePage(), // Add ProfilePage here
+  ];
 
   PreferredSizeWidget? _buildAppBar() {
     return PreferredSize(
@@ -111,7 +109,6 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Theme(
-            // Apply theme for active/inactive label colors
             data: Theme.of(context).copyWith(
               textTheme: Theme.of(context).textTheme.copyWith(
                     bodySmall: TextStyle(
@@ -129,7 +126,6 @@ class _HomePageState extends State<HomePage> {
               radius: 30,
               width: MediaQuery.of(context).size.width - 20,
               height: 65,
-          
             ),
           ),
         ),

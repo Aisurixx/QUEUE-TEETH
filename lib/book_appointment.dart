@@ -61,7 +61,7 @@ class AppointmentPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView( // Added SingleChildScrollView
+            child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: groupedChoices.entries.map((entry) {
@@ -79,16 +79,15 @@ class AppointmentPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8.0),
-                      // Use a GridView.builder for each category
                       GridView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(), // Disable GridView scrolling
+                        physics: NeverScrollableScrollPhysics(),
                         itemCount: services.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 1,
                           crossAxisSpacing: 16.0,
                           mainAxisSpacing: 16.0,
-                          childAspectRatio: 3.5, // Adjusted for smaller size
+                          childAspectRatio: 3.5,
                         ),
                         itemBuilder: (context, index) {
                           final service = services[index]['label']!;
@@ -106,12 +105,13 @@ class AppointmentPage extends StatelessWidget {
                                 );
                               },
                               child: Container(
+                                height: 40.0, // Set a fixed height for the button
                                 decoration: BoxDecoration(
                                   color: Color(0xFFE5D9F2),
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderRadius: BorderRadius.circular(30.0), // Increased border radius
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0), // Reduced horizontal padding
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -119,7 +119,7 @@ class AppointmentPage extends StatelessWidget {
                                         service,
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 18.0, // Adjusted font size
+                                          fontSize: 16.0,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -127,7 +127,7 @@ class AppointmentPage extends StatelessWidget {
                                         price,
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 16.0, // Adjusted font size
+                                          fontSize: 14.0,
                                         ),
                                       ),
                                     ],
@@ -138,10 +138,9 @@ class AppointmentPage extends StatelessWidget {
                           );
                         },
                       ),
-                      // Add padding below the Extractions service
                       if (services.any((s) => s['label'] == 'Extractions')) 
-                        SizedBox(height: 70.0), // Adjust height as needed
-                      SizedBox(height: 16.0), // Add spacing between categories
+                        SizedBox(height: 70.0),
+                      SizedBox(height: 16.0),
                     ],
                   );
                 }).toList(),

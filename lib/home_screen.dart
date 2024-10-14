@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
   static const String noAppointmentsMessage = 'No upcoming appointments';
   static const String errorMessage = 'Error: ';
   static const double appBarHeight = 60.0;
-  static const double frontieContainerHeightFactor = 0.25;
+  static const double frontieContainerHeightFactor = 0.20; // Reduced size
 
   @override
   Widget build(BuildContext context) {
@@ -62,56 +62,57 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildFrontieSection(BuildContext context) {
+ 
+Widget buildFrontieSection(BuildContext context) {
   double containerHeight = MediaQuery.of(context).size.height * frontieContainerHeightFactor;
 
   return Container(
     width: double.infinity,
     height: containerHeight,
-    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+    padding: const EdgeInsets.all(20.0), // Adjusted padding for a sleeker look
     margin: const EdgeInsets.symmetric(horizontal: 16.0),
     decoration: BoxDecoration(
       gradient: const LinearGradient(
         colors: [
-          Color(0xFFE5D9F2),
-          Color(0xFFD1C4E9),
+          Color(0xFF1E1E2F), // Dark background
+          Color(0xFF2A2A3C), // Slightly lighter dark
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.2),
-          spreadRadius: 2,
-          blurRadius: 6,
+          color: Colors.blue.withOpacity(0.2), // A blue shadow for a techy feel
+          spreadRadius: 3,
+          blurRadius: 10,
           offset: const Offset(0, 4),
         ),
       ],
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(20.0), // Slightly more rounded corners
     ),
     child: Row(
+      mainAxisAlignment: MainAxisAlignment.start, // Align to the start (top left)
+      crossAxisAlignment: CrossAxisAlignment.start, // Align items at the start vertically
       children: [
         ClipOval(
-          
           child: Image.asset(
             'assets/pogisivenz.png',
-            width: 50,
+            width: 50, // Increased size for better visibility
             height: 50,
             fit: BoxFit.cover,
           ),
         ),
-        const SizedBox(width: 10), // Space between image and text
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center, // Center the text vertically beside the image
+        const SizedBox(width: 15), // Space between image and text
+        Column( // Use Column for the text
+          crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
           children: const [
             Text(
               'Dr. Emelyn Vidal',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              'Status: Online',
-              style: TextStyle(color: Colors.green, fontSize: 14),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.white, // White for better contrast
+              ),
             ),
           ],
         ),
@@ -119,6 +120,10 @@ class HomeScreen extends StatelessWidget {
     ),
   );
 }
+
+
+
+
 
 
 
@@ -196,60 +201,107 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildCategorySection(String title, List<Appointment> appointments) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title == 'This Week') // Only add this text for 'This Week'
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Center the row
+            children: [
+              const Padding( // Add padding to the title
+                padding: EdgeInsets.only(right: 8.0), // Space between text and icon
+                child: Text(
+                  'Upcoming Appointments',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 0, 0, 0),
+                  ),
+                ),
+              ),
+              const Icon(Icons.notifications, color: Colors.yellow, size: 20),
+            ],
           ),
-          const SizedBox(height: 8),
-          appointments.isNotEmpty
+        const SizedBox(height: 8),
+        // Title aligned to the left
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding( // Add padding to the title
+            padding: const EdgeInsets.only(left: 70.0), // Adjust this value as needed
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: Color.fromARGB(255, 0, 0, 0),
+                shadows: [
+                  Shadow(
+                    color: Colors.blueAccent,
+                    blurRadius: 10,
+                    offset: Offset(0, 0),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Centered appointment card
+        Center(
+          child: appointments.isNotEmpty
               ? buildAppointmentCard(appointments.first)
-              : const Text('No appointments'),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
+              : const Text('No appointments', style: TextStyle(color: Colors.white70)),
+        ),
+        const SizedBox(height: 20),
+      ],
+    ),
+  );
+}
+
+
+
+
+
 
   Widget buildAppointmentCard(Appointment appointment) {
-  final formattedDate = DateFormat('MMMM d, yyyy').format(DateTime.parse(appointment.date).toLocal()); // Convert UTC to local
-  
+  final formattedDate = DateFormat('MMMM d, yyyy').format(DateTime.parse(appointment.date).toLocal());
+
   return ClipRRect(
-    borderRadius: BorderRadius.circular(20), // Rounded corners for a softer, glassy look
+    borderRadius: BorderRadius.circular(15), // Border radius remains unchanged
     child: Container(
+      width: 280, // You can adjust this width as needed
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1), // Light opacity for a translucent effect
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2), // Border to simulate the glass edge
+          color: const Color.fromARGB(255, 86, 29, 94).withOpacity(0.5), // Neon blue border
+          width: 1.5, // Border width remains unchanged
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25), // Subtle shadow for depth
+            color: Colors.blueAccent.withOpacity(0.5), // Neon glow effect
             spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 5), // Lifted shadow effect
+            blurRadius: 20, // Shadow blur remains unchanged
+            offset: const Offset(0, 0),
           ),
         ],
       ),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5), // Strong blur for glass distortion
+        filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7), // Blur remains unchanged
         child: Container(
-          padding: const EdgeInsets.all(20), // More padding for content spacing
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Reduced padding
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.white.withOpacity(0.2),
-                Colors.white.withOpacity(0.1),
+                Colors.white.withOpacity(0.15),
+                Colors.white.withOpacity(0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-            ), // Subtle gradient for depth within the glass
-            borderRadius: BorderRadius.circular(20),
+            ),
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,27 +310,60 @@ class HomeScreen extends StatelessWidget {
                 appointment.service,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20, // Larger font size
-                  color: Colors.white, // Bright white for contrast
+                  fontSize: 16, // Reduced font size for service name
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.blueAccent,
+                      blurRadius: 8, // Shadow blur remains unchanged
+                      offset: Offset(0, 0), // Neon text shadow
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Date: $formattedDate - Time: ${appointment.time}',
-                style: const TextStyle(color: Colors.white70), // Semi-transparent white text
+              const SizedBox(height: 4), // Reduced space between elements
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today, color: Colors.white70, size: 14), // Smaller icon size
+                  const SizedBox(width: 5),
+                  Text(
+                    'Date: $formattedDate',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12), // Reduced font size
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
-              Text(
-                'Duration: ${appointment.duration ?? 'N/A'}',
-                style: const TextStyle(color: Colors.white70),
+              Row(
+                children: [
+                  const Icon(Icons.access_time, color: Colors.white70, size: 14),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Time: ${appointment.time}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
-              Text(
-                'Status: Confirmed',
-                style: const TextStyle(
-                  color: Colors.greenAccent, // Green accent for status
-                  fontSize: 14,
-                ),
+              Row(
+                children: [
+                  const Icon(Icons.timer, color: Colors.white70, size: 14),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Duration: ${appointment.duration ?? 'N/A'}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8), // Slightly reduced space
+              Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.greenAccent, size: 14),
+                  const SizedBox(width: 5),
+                  const Text(
+                    'Status: Confirmed',
+                    style: TextStyle(color: Colors.greenAccent, fontSize: 12), // Smaller status text
+                  ),
+                ],
               ),
             ],
           ),
@@ -287,6 +372,8 @@ class HomeScreen extends StatelessWidget {
     ),
   );
 }
+
+
 
 
 }

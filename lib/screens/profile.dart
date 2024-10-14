@@ -4,7 +4,7 @@ import 'package:queueteeth/login.dart';
 
 class ProfilePage extends StatelessWidget {
   final String imagePath = 'assets/pogisivenz.png';
-  final String userName = 'Harold nag LULU'; 
+  final String userName = 'Joden Jasmin'; 
   final String backgroundImagePath = 'assets/splash.png';
   final String appBarBackgroundImagePath = 'assets/appbar.png'; // AppBar background image path
 
