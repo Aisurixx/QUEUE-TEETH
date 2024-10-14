@@ -37,11 +37,14 @@ class AppointmentPage extends StatelessWidget {
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(
-              'Appointments',
-              style: TextStyle(
-                color: Color(0xFFE5D9F2),
-                fontFamily: 'Roboto',
+            title: Container(
+              padding: EdgeInsets.only(top: 30), // Adjust this value as needed
+              child: Text(
+                'Appointments',
+                style: TextStyle(
+                  color: Color(0xFFE5D9F2),
+                  fontFamily: 'Roboto',
+                ),
               ),
             ),
             centerTitle: true,
@@ -58,85 +61,90 @@ class AppointmentPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ListView.builder(
-              itemCount: groupedChoices.keys.length,
-              itemBuilder: (context, index) {
-                final category = groupedChoices.keys.elementAt(index);
-                final services = groupedChoices[category]!;
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: groupedChoices.entries.map((entry) {
+                  final category = entry.key;
+                  final services = entry.value;
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      category,
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        category,
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8.0),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: services.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
-                        childAspectRatio: 4.0,
-                      ),
-                      itemBuilder: (context, index) {
-                        final service = services[index]['label']!;
-                        final price = services[index]['price']!;
+                      SizedBox(height: 8.0),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: services.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          crossAxisSpacing: 16.0,
+                          mainAxisSpacing: 16.0,
+                          childAspectRatio: 3.5,
+                        ),
+                        itemBuilder: (context, index) {
+                          final service = services[index]['label']!;
+                          final price = services[index]['price']!;
 
-                        return MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CalendarPage(service: service, price: price),
+                          return MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CalendarPage(service: service, price: price),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 40.0, // Set a fixed height for the button
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE5D9F2),
+                                  borderRadius: BorderRadius.circular(30.0), // Increased border radius
                                 ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Color(0xFFE5D9F2),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      service,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0), // Reduced horizontal padding
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        service,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      price,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 18.0,
+                                      Text(
+                                        price,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14.0,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 16.0), // Add spacing between categories
-                  ],
-                );
-              },
+                          );
+                        },
+                      ),
+                      if (services.any((s) => s['label'] == 'Extractions')) 
+                        SizedBox(height: 70.0),
+                      SizedBox(height: 16.0),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ],

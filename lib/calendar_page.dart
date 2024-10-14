@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'receipt_page.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -22,38 +22,53 @@ class _CalendarPageState extends State<CalendarPage> {
   late DateTime _focusedDay;
   TimeOfDay? _selectedTime;
   bool _isLoading = false;
-  bool _isPaymentLoading = false;
-  List<DateTime> _bookedDates = []; // List to hold booked dates
+  Map<DateTime, List<TimeOfDay>> _bookedAppointments = {};
+  
+  // Variable to store payment ID
+  String? _paymentId;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
     _focusedDay = DateTime.now();
-    _fetchBookedDates(); // Fetch booked dates on init
+    _fetchBookedAppointments();
   }
 
-  Future<void> _fetchBookedDates() async {
+  Future<void> _fetchBookedAppointments() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Fetch booked dates from the Supabase database
       final response = await Supabase.instance.client
           .from('appointments')
-          .select('date')
+          .select('date, time')
           .execute();
 
       if (response.status == 200) {
         final List<dynamic> data = response.data;
-
-        // Convert fetched date strings to DateTime objects and add to the list
         setState(() {
-          _bookedDates = data.map((e) => DateTime.parse(e['date'])).toList();
+          for (var item in data) {
+            DateTime date = DateTime.parse(item['date']);
+            TimeOfDay time = TimeOfDay(
+              hour: int.parse(item['time'].split(':')[0]),
+              minute: int.parse(item['time'].split(':')[1]),
+            );
+            if (_bookedAppointments.containsKey(date)) {
+              _bookedAppointments[date]!.add(time);
+            } else {
+              _bookedAppointments[date] = [time];
+            }
+          }
         });
       } else {
-        print("Error fetching booked dates: ${response.error?.message}");
+        final errorMessage = response.data != null
+            ? response.data['message'] ?? 'Unknown error occurred.'
+            : 'Error fetching booked appointments.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error fetching booked appointments: $errorMessage")),
+        );
       }
     } catch (e) {
       print("Error: $e");
@@ -64,17 +79,64 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
+  Future<String?> _makePayment(double amount) async {
+    final String paymongoUrl = 'https://api.paymongo.com/v1/links'; // Create a payment intent
+    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN'; // Your PayMongo secret key
+
+    final response = await http.post(
+      Uri.parse(paymongoUrl),
+      headers: {
+        'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKey:'))}',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'data': {
+          'attributes': {
+            'amount': (amount * 100).toInt(), // PayMongo expects amount in cents
+            'currency': 'PHP', // Your currency
+            'payment_method_allowed': ['gcash', 'card'], // Specify allowed payment methods
+            'description': 'Payment for ${widget.service} on ${DateFormat('yyyy-MM-dd').format(_selectedDay)} at ${_selectedTime!.format(context)}',
+          },
+        },
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      _paymentId = responseData['data']['id']; // Store the payment ID
+      return responseData['data']['attributes']['checkout_url']; // Get the checkout URL
+    } else {
+      print('Payment intent creation failed: ${response.body}');
+      return null; // Return null if the payment creation fails
+    }
+  }
+
+  Future<bool> _checkPaymentStatus(String paymentId) async {
+    final String paymongoPaymentUrl = 'https://api.paymongo.com/v1/payments/$paymentId'; // Your payment URL
+    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN'; // Your PayMongo secret key
+
+    final response = await http.get(
+      Uri.parse(paymongoPaymentUrl),
+      headers: {
+        'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKey:'))}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      print('Payment Status Response: $responseData'); // Debugging line
+      return responseData['data']['attributes']['status'] == 'paid'; // Check if the status is paid
+    } else {
+      print('Payment status check failed: ${response.body}');
+      return false; // Return false if the status check fails
+    }
+  }
+
   Future<void> _saveAppointment() async {
     if (_selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please select a time.")),
-      );
-      return;
-    }
-
-    if (widget.price.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Price is required.")),
       );
       return;
     }
@@ -106,64 +168,46 @@ class _CalendarPageState extends State<CalendarPage> {
       return;
     }
 
-    print('Inserting appointment with price: $parsedPrice');
-
-    final response = await Supabase.instance.client
-        .from('appointments')
-        .insert({
-          'service': widget.service,
-          'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
-          'time': _selectedTime!.format(context),
-          'price': parsedPrice,
-          'user_id': user.id,
-        })
-        .execute();
-
-    if (response.status == 201) {
-      await _initiatePayment(widget.price);
-      _fetchBookedDates(); // Refresh booked dates after saving
-    } else {
-      final errorMessage = response.error?.message ?? 'Unknown error';
-      print("Error: $errorMessage");
+    // Step 1: Make the payment and get the URL
+    String? checkoutUrl = await _makePayment(parsedPrice);
+    if (checkoutUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving appointment: $errorMessage")),
+        SnackBar(content: Text("Payment failed. Please try again.")),
       );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
     }
 
-    setState(() {
-      _isLoading = false;
-    });
-  }
+    // Step 2: Open the checkout URL in the browser
+    if (await canLaunch(checkoutUrl)) {
+      await launch(checkoutUrl); // Open the URL
+    } else {
+      throw 'Could not launch $checkoutUrl';
+    }
 
-  Future<void> _initiatePayment(String price) async {
-    setState(() {
-      _isPaymentLoading = true;
-    });
+    // Add a delay before checking the payment status
+    await Future.delayed(Duration(seconds: 5));
 
-    final String url = 'https://api.paymongo.com/v1/links';
-    final String secretKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN';
+    // Step 3: Check the payment status using the stored payment ID
+    bool isPaid = await _checkPaymentStatus(_paymentId!); // Use the stored payment ID
+    if (isPaid) {
+      // Save the appointment only if the payment is confirmed
+      final response = await Supabase.instance.client
+          .from('appointments')
+          .insert({
+            'service': widget.service,
+            'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
+            'time': _selectedTime!.format(context), // Ensure time is formatted correctly
+            'price': parsedPrice,
+            'user_id': user.id,
+          })
+          .execute();
 
-    final body = {
-      "data": {
-        "attributes": {
-          'amount': (double.tryParse(price.replaceAll('₱', '').replaceAll(',', '')) ?? 0) * 100,
-          'description': 'Payment for ${widget.service} on ${DateFormat('yyyy-MM-dd').format(_selectedDay)} at ${_selectedTime!.format(context)}',
-          'currency': 'PHP',
-        },
-      },
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + base64Encode(utf8.encode('$secretKey:')),
-        },
-        body: jsonEncode(body),
-      );
-
-      if (response.statusCode == 200) {
+      if (response.status == 201) {
+        await _fetchBookedAppointments();
+        // Navigate to the ReceiptPage and pass the appointment details
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -176,21 +220,32 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
         );
       } else {
-        final Map<String, dynamic> decodedBody = json.decode(response.body);
-        final errorMessage = decodedBody['errors']?.isNotEmpty ?? false
-            ? decodedBody['errors'][0]['detail']
-            : 'Unknown error occurred during payment.';
+        final errorMessage = response.data != null
+            ? response.data['message'] ?? 'Unknown error occurred.'
+            : 'Unknown error occurred.';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Payment Error: $errorMessage")),
+          SnackBar(content: Text("Error saving appointment: $errorMessage")),
         );
       }
-    } catch (e) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment Error: Unable to process request.")),
+        SnackBar(content: Text("Payment was not successful.")),
       );
-    } finally {
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _selectTime() async {
+    TimeOfDay? picked = await showTimePicker(
+      context: context, // Use the context from the stated
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
       setState(() {
-        _isPaymentLoading = false;
+        _selectedTime = picked;
       });
     }
   }
@@ -198,152 +253,53 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/appbar.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            title: Text(
-              'Select Date & Time',
-              style: TextStyle(
-                color: Color(0xFFE5D9F2),
-              ),
-            ),
-            centerTitle: true,
-            iconTheme: IconThemeData(
-              color: Color(0xFFE5D9F2),
-            ),
-          ),
-        ),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/splash.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(10),
+      appBar: AppBar(title: Text('Book Appointment')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TableCalendar(
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+              },
+              firstDay: DateTime.now().subtract(Duration(days: 365)), // One year ago
+              lastDay: DateTime.now().add(Duration(days: 365)), // One year from now
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  shape: BoxShape.circle,
                 ),
-                child: TableCalendar(
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(2030, 12, 31),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    // Check if the selected day is in the past
-                    if (selectedDay.isBefore(DateTime.now())) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Cannot select a date in the past.")),
-                      );
-                      return; // Do not update selected day if it's in the past
-                    }
-
-                    // Check if the selected day is already booked
-                    if (_bookedDates.contains(selectedDay)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("This date is already booked.")),
-                      );
-                      return; // Do not update selected day if it's booked
-                    }
-
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  calendarStyle: CalendarStyle(
-                    selectedDecoration: BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                    ),
-                    todayDecoration: BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
-                    ),
-                    defaultDecoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _bookedDates.contains(_focusedDay)
-                          ? Colors.red.withOpacity(0.5) // Change color for booked dates
-                          : Colors.white, // Default color for available dates
-                    ),
-                    outsideDecoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _bookedDates.contains(_focusedDay)
-                          ? Colors.red.withOpacity(0.5) // Change color for booked dates
-                          : Colors.white, // Default color for available dates
-                    ),
-                  ),
-                  headerStyle: HeaderStyle(
-                    formatButtonVisible: false,
-                    titleCentered: true,
-                    leftChevronVisible: true,
-                    rightChevronVisible: true,
-                    leftChevronIcon: Icon(Icons.chevron_left, color: Color.fromARGB(255, 15, 14, 16)),
-                    rightChevronIcon: Icon(Icons.chevron_right, color: Color.fromARGB(255, 15, 14, 16)),
-                  ),
+                selectedDecoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final TimeOfDay? picked = await showTimePicker(
-                    context: context,
-                    initialTime: _selectedTime ?? TimeOfDay.now(),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _selectedTime = picked;
-                    });
-                  }
-                },
-                child: Text('Pick Time'),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
               ),
-              SizedBox(height: 20),
-              if (_selectedTime != null)
-                Text(
-                  'Selected Time: ${_selectedTime!.format(context)}',
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _selectedTime == null ? null : () async {
-                  await _saveAppointment();
-                },
-                child: _isLoading || _isPaymentLoading
-                    ? CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      )
-                    : Text("Confirm Appointment"),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _selectTime,
+              child: Text(_selectedTime == null
+                  ? 'Select Time'
+                  : 'Time Selected: ${_selectedTime!.format(context)}'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _saveAppointment,
+              child: _isLoading
+                  ? CircularProgressIndicator()
+                  : Text('Book Appointment'),
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-extension on PostgrestResponse {
-  get error => null;
-}
-
-bool isSameDay(DateTime? day1, DateTime? day2) {
-  if (day1 == null || day2 == null) {
-    return false;
-  }
-  return day1.year == day2.year && day1.month == day2.month && day1.day == day2.day;
 }

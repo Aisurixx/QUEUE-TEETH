@@ -12,7 +12,6 @@ class AuthService {
         email: email,
         password: password,
       );
-
       return response.user != null;
     } catch (error) {
       print('SignIn Error: $error');
@@ -47,44 +46,92 @@ class _SignInPageState extends State<SignInPage> {
   static const String signInErrorMessage = 'Invalid email or password';
   static const String errorMessage = 'Error: ';
 
+  // Method to show dialog
+  Future<void> _showDialog(String title, String content) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // The dialog will not dismiss by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(content),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) return;
+  final email = _emailController.text;
+  final password = _passwordController.text;
 
-    final email = _emailController.text;
-    final password = _passwordController.text;
+  // Check if both email and password are missing
+  if (email.isEmpty && password.isEmpty) {
+    _showDialog('Invalid Input', 'Please input a valid email and password');
+    return;
+  }
 
+  // Check if email is missing or invalid
+  if (email.isEmpty) {
+    _showDialog('Invalid Input', 'Please enter a valid email address');
+    return;
+  } else if (!_isValidEmail(email)) {
+    _showDialog('Invalid Email', 'Please enter a valid email address');
+    return;
+  }
+
+  // Check if password is missing
+  if (password.isEmpty) {
+    _showDialog('Invalid Input', 'Please enter a valid password');
+    return;
+  }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    final isSuccess = await _authService.signIn(email, password);
     setState(() {
-      _isLoading = true;
+      _isLoading = false;
     });
 
-    try {
-      final isSuccess = await _authService.signIn(email, password);
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (isSuccess) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(signInSuccessMessage), duration: Duration(seconds: 2)),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(signInErrorMessage), duration: Duration(seconds: 2)),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+    if (isSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$errorMessage${e.toString()}'), duration: Duration(seconds: 2)),
+        SnackBar(content: Text(signInSuccessMessage), duration: Duration(seconds: 2)),
       );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } else {
+      // Show dialog for invalid username or password
+      _showDialog('Invalid Credentials', 'Input a valid username or password');
     }
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$errorMessage${e.toString()}'), duration: Duration(seconds: 2)),
+    );
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {

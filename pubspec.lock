@@ -134,6 +134,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_floating_bottom_bar:
+    dependency: "direct main"
+    description:
+      name: flutter_floating_bottom_bar
+      sha256: "5aff247b2015837bd121b6c694fb30107ed5677cd74e3088f6a5a18e369bc0ec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1+1"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -230,7 +238,7 @@ packages:
     source: hosted
     version: "4.2.0"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
