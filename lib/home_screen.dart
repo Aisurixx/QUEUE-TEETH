@@ -74,21 +74,14 @@ Widget buildFrontieSection(BuildContext context) {
     decoration: BoxDecoration(
       gradient: const LinearGradient(
         colors: [
-          Color(0xFF1E1E2F), // Dark background
-          Color(0xFF2A2A3C), // Slightly lighter dark
+          Color(0xFFFFFFFF), // White
+          Color(0xFE5FFF), // Grey
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.blue.withOpacity(0.2), // A blue shadow for a techy feel
-          spreadRadius: 3,
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ],
-      borderRadius: BorderRadius.circular(20.0), // Slightly more rounded corners
+      borderRadius: BorderRadius.circular(20.0), // Rounded corners
+      // Removed boxShadow property
     ),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start, // Align to the start (top left)
@@ -103,7 +96,7 @@ Widget buildFrontieSection(BuildContext context) {
           ),
         ),
         const SizedBox(width: 15), // Space between image and text
-        Column( // Use Column for the text
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
           children: const [
             Text(
@@ -120,6 +113,7 @@ Widget buildFrontieSection(BuildContext context) {
     ),
   );
 }
+
 
 
 
