@@ -45,6 +45,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   simple_floating_bottom_nav_bar: ^0.0.3
+  fluid_bottom_nav_bar: ^1.4.0
  
 
 dev_dependencies:
