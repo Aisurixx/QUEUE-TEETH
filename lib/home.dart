@@ -45,38 +45,7 @@ class _HomePageState extends State<HomePage> {
     ProfilePage(), // Add ProfilePage here
   ];
 
-  PreferredSizeWidget? _buildAppBar() {
-    return PreferredSize(
-      preferredSize: Size.fromHeight(60),
-      child: AppBar(
-        backgroundColor: Colors.transparent,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/appbar.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        title: Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: CircleAvatar(
-                backgroundImage: AssetImage('assets/pogisivenz.png'),
-                radius: 20,
-              ),
-            ),
-            SizedBox(width: 10),
-            Text(
-              'Hi, Harold Pogi',
-              style: TextStyle(color: Color(0xFFE5D9F2)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -88,7 +57,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: _buildAppBar(),
       body: Stack(
         children: [
           Positioned.fill(
