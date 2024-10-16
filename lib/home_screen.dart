@@ -160,6 +160,7 @@ Widget buildFrontieSection(BuildContext context) {
           .eq('user_id', Supabase.instance.client.auth.currentUser!.id)
           .gte('date', now.toIso8601String()) // Ensure the date comparison is in UTC
           .order('date', ascending: true)
+          // ignore: deprecated_member_use
           .execute();
 
       if (response.error != null) {
@@ -266,112 +267,101 @@ Widget buildFrontieSection(BuildContext context) {
 
 
   Widget buildAppointmentCard(Appointment appointment) {
-  final formattedDate = DateFormat('MMMM d, yyyy').format(DateTime.parse(appointment.date).toLocal());
+  final now = DateTime.now();
+  final appointmentDate = DateTime.parse(appointment.date);
 
-  return ClipRRect(
-    borderRadius: BorderRadius.circular(15), // Border radius remains unchanged
-    child: Container(
-      width: 280, // You can adjust this width as needed
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: const Color.fromARGB(255, 86, 29, 94).withOpacity(0.5), // Neon blue border
-          width: 1.5, // Border width remains unchanged
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blueAccent.withOpacity(0.5), // Neon glow effect
-            spreadRadius: 2,
-            blurRadius: 20, // Shadow blur remains unchanged
-            offset: const Offset(0, 0),
-          ),
-        ],
+  final formattedDate = DateFormat('MMMM d, yyyy').format(appointmentDate.toLocal());
+  final daysUntilAppointment = appointmentDate.difference(now).inDays;
+
+  // Progress calculation
+  final totalTime = appointmentDate.difference(now).inHours;
+  final timePassed = now.difference(appointmentDate.subtract(Duration(days: daysUntilAppointment))).inHours;
+  final progress = (timePassed / totalTime).clamp(0.0, 1.0);
+
+  return Container(
+    width: 280,
+    padding: const EdgeInsets.all(16),
+    margin: const EdgeInsets.symmetric(vertical: 10),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1A1A2E), // Deep navy blue background
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: const Color(0xFFD0D0D0), // Light gray border
+        width: 1.5,
       ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7), // Blur remains unchanged
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Reduced padding
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withOpacity(0.15),
-                Colors.white.withOpacity(0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.3),
+          blurRadius: 12,
+          spreadRadius: 1,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          appointment.service,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: Colors.white, // White text for contrast
+          ),
+        ),
+        const SizedBox(height: 8), // Space between items
+        Row(
+          children: [
+            const Icon(Icons.calendar_today, color: Colors.grey, size: 14),
+            const SizedBox(width: 5),
+            Text(
+              'Date: $formattedDate',
+              style: const TextStyle(color: Colors.grey, fontSize: 12), // Use grey for minimalistic style
             ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                appointment.service,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16, // Reduced font size for service name
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      color: Colors.blueAccent,
-                      blurRadius: 8, // Shadow blur remains unchanged
-                      offset: Offset(0, 0), // Neon text shadow
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4), // Reduced space between elements
-              Row(
-                children: [
-                  const Icon(Icons.calendar_today, color: Colors.white70, size: 14), // Smaller icon size
-                  const SizedBox(width: 5),
-                  Text(
-                    'Date: $formattedDate',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12), // Reduced font size
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.access_time, color: Colors.white70, size: 14),
-                  const SizedBox(width: 5),
-                  Text(
-                    'Time: ${appointment.time}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.timer, color: Colors.white70, size: 14),
-                  const SizedBox(width: 5),
-                  Text(
-                    'Duration: ${appointment.duration ?? 'N/A'}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8), // Slightly reduced space
-              Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.greenAccent, size: 14),
-                  const SizedBox(width: 5),
-                  const Text(
-                    'Status: Confirmed',
-                    style: TextStyle(color: Colors.greenAccent, fontSize: 12), // Smaller status text
-                  ),
-                ],
-              ),
-            ],
-          ),
+          ],
         ),
-      ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            const Icon(Icons.access_time, color: Colors.grey, size: 14),
+            const SizedBox(width: 5),
+            Text(
+              'Time: ${appointment.time}',
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12), // Space before the status
+        Row(
+          children: [
+            const Icon(Icons.check_circle, color: Color(0xFF00FF00), size: 14), // Green for confirmed
+            const SizedBox(width: 5),
+            const Text(
+              'Status: Confirmed',
+              style: TextStyle(color: Color(0xFF00FF00), fontSize: 12), // Green accent
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Progress Bar
+        LinearProgressIndicator(
+          value: progress,
+          backgroundColor: Colors.grey.withOpacity(0.2), // Lighter background for the bar
+          color: const Color(0xFF4CAF50), // Green for the progress indicator
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '${daysUntilAppointment > 0 ? "$daysUntilAppointment days" : "Today"} until appointment',
+          style: const TextStyle(color: Colors.grey, fontSize: 12), // Simple, understated text
+        ),
+      ],
     ),
   );
 }
+
+
+
+
 
 
 
