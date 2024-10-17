@@ -1,4 +1,4 @@
-  import 'dart:ui'; // Import for BackdropFilter
+ import 'dart:ui'; // Import for BackdropFilter
   import 'package:flutter/material.dart';
   import 'package:supabase_flutter/supabase_flutter.dart';
   import 'package:intl/intl.dart'; // For date formatting
@@ -49,128 +49,6 @@
       );
     }
 
-<<<<<<< HEAD
- 
-Widget buildFrontieSection(BuildContext context) {
-  double containerHeight = MediaQuery.of(context).size.height * frontieContainerHeightFactor;
-
-  return Container(
-    width: double.infinity,
-    height: containerHeight,
-    padding: const EdgeInsets.all(20.0), // Adjusted padding for a sleeker look
-    margin: const EdgeInsets.symmetric(horizontal: 16.0),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [
-          Color(0xFFFFFFFF), // White
-          Color(0xFE5FFF), // Grey
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      borderRadius: BorderRadius.circular(20.0), // Rounded corners
-      // Removed boxShadow property
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start, // Align to the start (top left)
-      crossAxisAlignment: CrossAxisAlignment.start, // Align items at the start vertically
-      children: [
-        ClipOval(
-          child: Image.asset(
-            'assets/pogisivenz.png',
-            width: 50, // Increased size for better visibility
-            height: 50,
-            fit: BoxFit.cover,
-          ),
-        ),
-        const SizedBox(width: 15), // Space between image and text
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-          children: const [
-            Text(
-              'Dr. Emelyn Vidal',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.white, // White for better contrast
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-
-
-
-
-
-
-
-  Widget buildAppointmentList() {
-    return FutureBuilder<Map<String, List<Appointment>>>(
-      future: fetchUpcomingAppointments(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('$errorMessage${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text(noAppointmentsMessage));
-        } else {
-          final appointments = snapshot.data!;
-          return buildAppointmentsSections(appointments);
-        }
-      },
-    );
-  }
-
-  Future<Map<String, List<Appointment>>> fetchUpcomingAppointments() async {
-    final now = DateTime.now().toUtc(); // Use UTC for consistency
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    final endOfWeek = startOfWeek.add(const Duration(days: 6));
-    final startOfNextWeek = endOfWeek.add(const Duration(days: 1));
-    final endOfNextWeek = startOfNextWeek.add(const Duration(days: 6));
-
-    try {
-      // Fetch all upcoming appointments
-      final response = await Supabase.instance.client
-          .from('appointments')
-          .select()
-          .eq('user_id', Supabase.instance.client.auth.currentUser!.id)
-          .gte('date', now.toIso8601String()) // Ensure the date comparison is in UTC
-          .order('date', ascending: true)
-          .execute();
-
-      if (response.error != null) {
-        throw Exception('Error fetching appointments: ${response.error!.message}');
-      }
-
-      final List<dynamic> data = response.data;
-      if (data == null || data.isEmpty) return {}; // Handle empty case
-
-      final allAppointments = data.map((json) => Appointment.fromJson(json)).toList();
-
-      // Filter appointments into two categories
-      final thisWeekAppointments = allAppointments.where((appt) {
-        final appointmentDate = DateTime.parse(appt.date).toUtc(); // Parse as UTC
-        return appointmentDate.isAfter(startOfWeek) && appointmentDate.isBefore(endOfWeek);
-      }).toList();
-
-      final nextWeekAppointments = allAppointments.where((appt) {
-        final appointmentDate = DateTime.parse(appt.date).toUtc(); // Parse as UTC
-        return appointmentDate.isAfter(startOfNextWeek) && appointmentDate.isBefore(endOfNextWeek);
-      }).toList();
-
-      return {
-        'thisWeek': thisWeekAppointments,
-        'nextWeek': nextWeekAppointments,
-      };
-    } catch (e) {
-      throw Exception('Error fetching appointments: $e');
-=======
     Widget buildBackground() {
       return Container(
         width: double.infinity,
@@ -182,7 +60,6 @@ Widget buildFrontieSection(BuildContext context) {
           ),
         ),
       );
->>>>>>> 5709aeecee5ea140cf2505c40c6bf216209f4ffd
     }
 
   

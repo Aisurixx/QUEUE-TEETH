@@ -1,3 +1,4 @@
+import 'dart:ui'; // Import this for BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:queueteeth/home.dart';
 // Import the home screen
@@ -38,10 +39,33 @@ class ReceiptPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Service: $service", style: TextStyle(fontSize: 20, color: Colors.white)),
-                  Text("Date: ${date.toLocal().toIso8601String().split('T')[0]}", style: TextStyle(fontSize: 20, color: Colors.white)),
-                  Text("Time: ${time.format(context)}", style: TextStyle(fontSize: 20, color: Colors.white)),
-                  Text("Price: $price", style: TextStyle(fontSize: 20, color: Colors.white)),
+                  // Glassmorphism effect
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0), // Rounded corners
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2), // Semi-transparent white
+                        borderRadius: BorderRadius.circular(15.0), // Match the ClipRRect
+                      ),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Blur effect
+                        child: Container(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Text("Service: $service", style: TextStyle(fontSize: 20, color: Colors.black)),
+                              SizedBox(height: 10),
+                              Text("Date: ${date.toLocal().toIso8601String().split('T')[0]}", style: TextStyle(fontSize: 20, color: Colors.black)),
+                              SizedBox(height: 10),
+                              Text("Time: ${time.format(context)}", style: TextStyle(fontSize: 20, color: Colors.black)),
+                              SizedBox(height: 10),
+                              Text("Price: $price", style: TextStyle(fontSize: 20, color: Colors.black)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -52,7 +76,10 @@ class ReceiptPage extends StatelessWidget {
                         (route) => false, // Removes all previous routes
                       );
                     },
-                    child: Text("Back to Home"),
+                    child: Text(
+                      "Back to Home",
+                      style: TextStyle(color: Colors.black), // Set button text color to black
+                    ),
                   ),
                 ],
               ),

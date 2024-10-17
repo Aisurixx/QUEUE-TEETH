@@ -24,7 +24,6 @@ class _CalendarPageState extends State<CalendarPage> {
   bool _isLoading = false;
   Map<DateTime, List<TimeOfDay>> _bookedAppointments = {};
   
- 
   String? _paymentId;
 
   @override
@@ -80,8 +79,8 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<String?> _makePayment(double amount) async {
-    final String paymongoUrl = 'https://api.paymongo.com/v1/links'; // Create a payment intent
-    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN'; // Your PayMongo secret key
+    final String paymongoUrl = 'https://api.paymongo.com/v1/links';
+    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN';
 
     final response = await http.post(
       Uri.parse(paymongoUrl),
@@ -92,9 +91,9 @@ class _CalendarPageState extends State<CalendarPage> {
       body: jsonEncode({
         'data': {
           'attributes': {
-            'amount': (amount * 100).toInt(), // PayMongo expects amount in cents
-            'currency': 'PHP', // Your currency
-            'payment_method_allowed': ['gcash', 'card'], // Specify allowed payment methods
+            'amount': (amount * 100).toInt(),
+            'currency': 'PHP',
+            'payment_method_allowed': ['gcash', 'card'],
             'description': 'Payment for ${widget.service} on ${DateFormat('yyyy-MM-dd').format(_selectedDay)} at ${_selectedTime!.format(context)}',
           },
         },
@@ -103,17 +102,17 @@ class _CalendarPageState extends State<CalendarPage> {
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      _paymentId = responseData['data']['id']; // Store the payment ID
-      return responseData['data']['attributes']['checkout_url']; // Get the checkout URL
+      _paymentId = responseData['data']['id'];
+      return responseData['data']['attributes']['checkout_url'];
     } else {
       print('Payment intent creation failed: ${response.body}');
-      return null; // Return null if the payment creation fails
+      return null;
     }
   }
 
   Future<bool> _checkPaymentStatus(String paymentId) async {
-    final String paymongoPaymentUrl = 'https://api.paymongo.com/v1/payments/$paymentId'; // Your payment URL
-    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN'; // Your PayMongo secret key
+    final String paymongoPaymentUrl = 'https://api.paymongo.com/v1/payments/$paymentId';
+    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN';
 
     final response = await http.get(
       Uri.parse(paymongoPaymentUrl),
@@ -125,114 +124,106 @@ class _CalendarPageState extends State<CalendarPage> {
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      print('Payment Status Response: $responseData'); // Debugging line
-      return responseData['data']['attributes']['status'] == 'paid'; // Check if the status is paid
+      return responseData['data']['attributes']['status'] == 'paid';
     } else {
       print('Payment status check failed: ${response.body}');
-      return false; // Return false if the status check fails
+      return false;
     }
   }
 
   Future<void> _saveAppointment() async {
-  if (_selectedTime == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please select a time.")),
-    );
-    return;
-  }
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select a time.")),
+      );
+      return;
+    }
 
-  setState(() {
-    _isLoading = true;
-  });
-
-  final user = Supabase.instance.client.auth.currentUser;
-
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("User is not authenticated.")),
-    );
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
-    return;
-  }
 
-  double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
-  if (parsedPrice == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Invalid price format.")),
-    );
-    setState(() {
-      _isLoading = false;
-    });
-    return;
-  }
+    final user = Supabase.instance.client.auth.currentUser;
 
-  // Step 1: Make the payment and get the URL
-  String? checkoutUrl = await _makePayment(parsedPrice);
-  if (checkoutUrl == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Payment failed. Please try again.")),
-    );
-    setState(() {
-      _isLoading = false;
-    });
-    return;
-  }
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User is not authenticated.")),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
 
-  // Step 2: Open the checkout URL in the browser
-  if (await canLaunch(checkoutUrl)) {
-    await launch(checkoutUrl); // Open the URL
-  } else {
-    throw 'Could not launch $checkoutUrl';
-  }
+    double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
+    if (parsedPrice == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid price format.")),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
 
-  // **Remove the delay and payment status check**
+    String? checkoutUrl = await _makePayment(parsedPrice);
+    if (checkoutUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Payment failed. Please try again.")),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
 
-  // Step 3: Save the appointment regardless of payment status
-  final response = await Supabase.instance.client
-      .from('appointments')
-      .insert({
-        'service': widget.service,
-        'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
-        'time': _selectedTime!.format(context), // Ensure time is formatted correctly
-        'price': parsedPrice,
-        'user_id': user.id,
-      })
-      .execute();
+    if (await canLaunch(checkoutUrl)) {
+      await launch(checkoutUrl);
+    } else {
+      throw 'Could not launch $checkoutUrl';
+    }
 
-  if (response.status == 201) {
-    await _fetchBookedAppointments();
-    // Navigate to the ReceiptPage and pass the appointment details
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ReceiptPage(
-          service: widget.service,
-          date: _selectedDay,
-          time: _selectedTime!,
-          price: widget.price,
+    final response = await Supabase.instance.client
+        .from('appointments')
+        .insert({
+          'service': widget.service,
+          'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
+          'time': _selectedTime!.format(context),
+          'price': parsedPrice,
+          'user_id': user.id,
+        })
+        .execute();
+
+    if (response.status == 201) {
+      await _fetchBookedAppointments();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReceiptPage(
+            service: widget.service,
+            date: _selectedDay,
+            time: _selectedTime!,
+            price: widget.price,
+          ),
         ),
-      ),
-    );
-  } else {
-    final errorMessage = response.data != null
-        ? response.data['message'] ?? 'Unknown error occurred.'
-        : 'Unknown error occurred.';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error saving appointment: $errorMessage")),
-    );
+      );
+    } else {
+      final errorMessage = response.data != null
+          ? response.data['message'] ?? 'Unknown error occurred.'
+          : 'Unknown error occurred.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving appointment: $errorMessage")),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
-
-  setState(() {
-    _isLoading = false;
-  });
-}
-
 
   Future<void> _selectTime() async {
     TimeOfDay? picked = await showTimePicker(
-      context: context, // Use the context from the stated
+      context: context,
       initialTime: TimeOfDay.now(),
     );
     if (picked != null) {
@@ -245,51 +236,83 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Book Appointment')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TableCalendar(
-              focusedDay: _focusedDay,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              },
-              firstDay: DateTime.now().subtract(Duration(days: 365)), // One year ago
-              lastDay: DateTime.now().add(Duration(days: 365)), // One year from now
-              calendarStyle: CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
+      appBar: AppBar(
+        title: Text(
+          'Book Appointment',
+          style: TextStyle(color: Color(0xFFE5D9F2)), // Set AppBar text color
+        ),
+        backgroundColor: Colors.blueAccent, // Optional: Set AppBar background color
+        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)), // Set back button color
+        flexibleSpace: Image.asset(
+          'assets/appbar.png',
+          fit: BoxFit.cover,
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/splash.png'), // Background image
+            fit: BoxFit.cover, // Cover the entire screen
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Container for the date selection area with a white background
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white, // White background
+                  borderRadius: BorderRadius.circular(8.0), // Rounded corners
                 ),
-                selectedDecoration: BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
+                padding: EdgeInsets.all(16.0), // Padding around the calendar
+                child: TableCalendar(
+                  focusedDay: _focusedDay,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  firstDay: DateTime.now().subtract(Duration(days: 365)),
+                  lastDay: DateTime.now().add(Duration(days: 365)),
+                  calendarStyle: CalendarStyle(
+                    todayDecoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      shape: BoxShape.circle,
+                    ),
+                    selectedDecoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                  ),
                 ),
               ),
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: _selectTime,
+                child: Text(
+                  _selectedTime == null
+                      ? 'Select Time'
+                      : 'Selected Time: ${_selectedTime!.format(context)}',
+                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _selectTime,
-              child: Text(_selectedTime == null
-                  ? 'Select Time'
-                  : 'Time Selected: ${_selectedTime!.format(context)}'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _saveAppointment,
-              child: _isLoading
-                  ? CircularProgressIndicator()
-                  : Text('Book Appointment'),
-            ),
-          ],
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: _saveAppointment,
+                child: Text(
+                  'Confirm Appointment',
+                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
+                ),
+              ),
+              if (_isLoading) CircularProgressIndicator(),
+            ],
+          ),
         ),
       ),
     );
