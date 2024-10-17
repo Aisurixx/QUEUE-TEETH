@@ -233,64 +233,59 @@
     }
 
     Widget buildCategorySection(String title, List<Appointment> appointments) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (title == 'This Week') // Only add this text for 'This Week'
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Center the row
-              children: [
-                const Padding( // Add padding to the title
-                  padding: EdgeInsets.only(right: 8.0), // Space between text and icon
-                  child: Text(
-                    'Upcoming Appointments',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title == 'This Week') // Only add this text for 'This Week'
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Center the row
+            children: [
+              const Padding( // Add padding to the title
+                padding: EdgeInsets.only(right: 8.0), // Space between text and icon
+                child: Text(
+                  'Upcoming Appointments',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
-                const Icon(Icons.notifications, color: Colors.yellow, size: 20),
-              ],
-            ),
-          const SizedBox(height: 8),
-          // Title aligned to the left
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding( // Add padding to the title
-              padding: const EdgeInsets.only(left: 70.0), // Adjust this value as needed
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: Color.fromARGB(255, 0, 0, 0),
-                  shadows: [
-                    Shadow(
-                      color: Colors.blueAccent,
-                      blurRadius: 10,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
+              ),
+              const Icon(Icons.notifications, color: Colors.yellow, size: 20),
+            ],
+          ),
+        const SizedBox(height: 8),
+        // Title aligned to the left
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Padding( // Add padding to the title
+            padding: const EdgeInsets.only(left: 70.0), // Adjust this value as needed
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: Color.fromARGB(255, 0, 0, 0),
+                // Removed shadows property
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          // Centered appointment card
-          Center(
-            child: appointments.isNotEmpty
-                ? buildAppointmentCard(appointments.first)
-                : const Text('No appointments', style: TextStyle(color: Colors.white70)),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
+        ),
+        const SizedBox(height: 8),
+        // Centered appointment card
+        Center(
+          child: appointments.isNotEmpty
+              ? buildAppointmentCard(appointments.first)
+              : const Text('No appointments', style: TextStyle(color: Colors.white70)),
+        ),
+        const SizedBox(height: 20),
+      ],
+    ),
+  );
+}
+
 
 
 

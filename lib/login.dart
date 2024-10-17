@@ -75,95 +75,98 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Future<void> _signIn() async {
-  final email = _emailController.text;
-  final password = _passwordController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
 
-  // Check if both email and password are missing
-  if (email.isEmpty && password.isEmpty) {
-    _showDialog('Invalid Input', 'Please input a valid email and password');
-    return;
-  }
-
-  // Check if email is missing or invalid
-  if (email.isEmpty) {
-    _showDialog('Invalid Input', 'Please enter a valid email address');
-    return;
-  } else if (!_isValidEmail(email)) {
-    _showDialog('Invalid Email', 'Please enter a valid email address');
-    return;
-  }
-
-  // Check if password is missing
-  if (password.isEmpty) {
-    _showDialog('Invalid Input', 'Please enter a valid password');
-    return;
-  }
-
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    final isSuccess = await _authService.signIn(email, password);
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (isSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(signInSuccessMessage), duration: Duration(seconds: 2)),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    } else {
-      // Show dialog for invalid username or password
-      _showDialog('Invalid Credentials', 'Input a valid username or password');
+    // Check if both email and password are missing
+    if (email.isEmpty && password.isEmpty) {
+      _showDialog('Invalid Input', 'Please input a valid email and password');
+      return;
     }
-  } catch (e) {
+
+    // Check if email is missing or invalid
+    if (email.isEmpty) {
+      _showDialog('Invalid Input', 'Please enter a valid email address');
+      return;
+    } else if (!_isValidEmail(email)) {
+      _showDialog('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    // Check if password is missing
+    if (password.isEmpty) {
+      _showDialog('Invalid Input', 'Please enter a valid password');
+      return;
+    }
+
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$errorMessage${e.toString()}'), duration: Duration(seconds: 2)),
-    );
+
+    try {
+      final isSuccess = await _authService.signIn(email, password);
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (isSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(signInSuccessMessage), duration: Duration(seconds: 2)),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        // Show dialog for invalid username or password
+        _showDialog('Invalid Credentials', 'Input a valid username or password');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$errorMessage${e.toString()}'), duration: Duration(seconds: 2)),
+      );
+    }
   }
-}
-
-
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/splash.png'),
-            fit: BoxFit.cover,
-          ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/splash.png'),
+          fit: BoxFit.cover,
         ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 50, // Adjust as needed
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Image.asset(
-                  'assets/logo.png',
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  height: MediaQuery.of(context).size.height * 0.25,
-                ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 5, // Adjust as needed
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Image.asset(
+                'assets/logo.png',
+                width: MediaQuery.of(context).size.width * 1,
+                height: MediaQuery.of(context).size.height * 0.5,
               ),
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: GestureDetector(
+                  onTap: () {
+                    // Dismiss keyboard when tapping outside of input fields
+                    FocusScope.of(context).unfocus();
+                  },
                   child: Container(
                     height: 400.0,
                     decoration: BoxDecoration(
@@ -181,112 +184,114 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            const Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                prefixIcon: Icon(Icons.email),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return emptyEmailMessage;
-                                }
-                                if (!_isValidEmail(value)) {
-                                  return invalidEmailMessage;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _passwordController,
-                              obscureText: !_passwordVisible,
-                              decoration: InputDecoration(
-                                labelText: 'Password',
-                                prefixIcon: Icon(Icons.lock),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _passwordVisible = !_passwordVisible;
-                                    });
-                                  },
+                    child: SingleChildScrollView( // Enable scrolling
+                      physics: BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return emptyPasswordMessage;
-                                }
-                                if (value.length < 6) {
-                                  return shortPasswordMessage;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _isLoading ? null : _signIn,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 236, 228, 228),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                  prefixIcon: Icon(Icons.email),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return emptyEmailMessage;
+                                  }
+                                  if (!_isValidEmail(value)) {
+                                    return invalidEmailMessage;
+                                  }
+                                  return null;
+                                },
                               ),
-                              child: _isLoading
-                                  ? SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(color: Colors.black),
-                                    )
-                                  : const Text('Sign In'),
-                            ),
-                            const Spacer(),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Don\'t have an account yet?',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: !_passwordVisible,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                  prefixIcon: Icon(Icons.lock),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _passwordVisible = !_passwordVisible;
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                GestureDetector(
-                                  onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Contacting admin...'), duration: Duration(seconds: 2)),
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Contact an admin',
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return emptyPasswordMessage;
+                                  }
+                                  if (value.length < 6) {
+                                    return shortPasswordMessage;
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: _isLoading ? null : _signIn,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color.fromARGB(255, 236, 228, 228),
+                                ),
+                                child: _isLoading
+                                    ? SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(color: Colors.black),
+                                      )
+                                    : const Text('Sign In'),
+                              ),
+                              const SizedBox(height: 10), // Space after button
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Don\'t have an account yet?',
                                     style: TextStyle(
-                                      color: Colors.blue,
+                                      color: Colors.black,
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(height: 8),
+                                  GestureDetector(
+                                    onTap: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Contacting admin...'), duration: Duration(seconds: 2)),
+                                      );
+                                    },
+                                    child: const Text(
+                                      'Contact an admin',
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -294,11 +299,13 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   bool _isValidEmail(String email) {
     final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
