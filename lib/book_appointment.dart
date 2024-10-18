@@ -139,7 +139,7 @@ class AppointmentPage extends StatelessWidget {
                         },
                       ),
                       if (services.any((s) => s['label'] == 'Extractions')) 
-                        SizedBox(height: 70.0),
+                        SizedBox(height: 40.0),
                       SizedBox(height: 16.0),
                     ],
                   );

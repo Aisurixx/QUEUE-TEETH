@@ -1,7 +1,6 @@
 import 'dart:ui'; // Import this for BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:queueteeth/home.dart';
-// Import the home screen
+import 'package:queueteeth/home.dart'; // Import your HomePage
 
 class ReceiptPage extends StatelessWidget {
   final String service;
@@ -20,8 +19,23 @@ class ReceiptPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Receipt"),
+        title: Center(
+          child: Text(
+            "Receipt",
+            style: TextStyle(color: Color(0xFFE5D9F2)), // Change text color
+          ),
+        ),
         automaticallyImplyLeading: false, // Remove the back button
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/appbar.png'), // Background image for the AppBar
+              fit: BoxFit.cover, // Cover the entire AppBar area
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent, // Make AppBar background transparent so the image shows
+        elevation: 0, // Remove shadow
       ),
       body: Stack(
         children: [
@@ -69,16 +83,20 @@ class ReceiptPage extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Navigate to HomeScreen
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                        (route) => false, // Removes all previous routes
-                      );
+                      // Go back to the HomePage without creating a new instance
+                      Navigator.popUntil(context, (route) => route.isFirst);
                     },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Color(0xFFE5D9F2), // Set button text color to #E5D9F2
+                      backgroundColor: Color(0xFF615792), // Set background color to #615792
+                      minimumSize: Size(200, 50), // Adjust button size
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                      ),
+                    ),
                     child: Text(
-                      "Back to Home",
-                      style: TextStyle(color: Colors.black), // Set button text color to black
+                      "Back to Appointments",
+                      style: TextStyle(fontSize: 18), // Adjust text size
                     ),
                   ),
                 ],

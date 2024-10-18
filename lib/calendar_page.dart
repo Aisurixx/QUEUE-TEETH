@@ -23,7 +23,7 @@ class _CalendarPageState extends State<CalendarPage> {
   TimeOfDay? _selectedTime;
   bool _isLoading = false;
   Map<DateTime, List<TimeOfDay>> _bookedAppointments = {};
-  
+
   String? _paymentId;
 
   @override
@@ -107,27 +107,6 @@ class _CalendarPageState extends State<CalendarPage> {
     } else {
       print('Payment intent creation failed: ${response.body}');
       return null;
-    }
-  }
-
-  Future<bool> _checkPaymentStatus(String paymentId) async {
-    final String paymongoPaymentUrl = 'https://api.paymongo.com/v1/payments/$paymentId';
-    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN';
-
-    final response = await http.get(
-      Uri.parse(paymongoPaymentUrl),
-      headers: {
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKey:'))}',
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      return responseData['data']['attributes']['status'] == 'paid';
-    } else {
-      print('Payment status check failed: ${response.body}');
-      return false;
     }
   }
 
@@ -238,11 +217,11 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Book Appointment',
-          style: TextStyle(color: Color(0xFFE5D9F2)), // Set AppBar text color
+          'Select Time and Date',
+          style: TextStyle(color: Color(0xFFE5D9F2)),
         ),
-        backgroundColor: Colors.blueAccent, // Optional: Set AppBar background color
-        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)), // Set back button color
+        backgroundColor: Colors.blueAccent,
+        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)),
         flexibleSpace: Image.asset(
           'assets/appbar.png',
           fit: BoxFit.cover,
@@ -251,21 +230,21 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Background image
-            fit: BoxFit.cover, // Cover the entire screen
+            image: AssetImage('assets/splash.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Container for the date selection area with a white background
+              // Date selection area
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white, // White background
-                  borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                padding: EdgeInsets.all(16.0), // Padding around the calendar
+                padding: EdgeInsets.all(16.0),
                 child: TableCalendar(
                   focusedDay: _focusedDay,
                   selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -292,25 +271,40 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              TextButton(
+              SizedBox(height: 16), // Space between sections
+              // Time selection button
+              ElevatedButton(
                 onPressed: _selectTime,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Color(0xFFE5D9F2),
+                  backgroundColor: Color(0xFF615792),
+                  minimumSize: Size(200, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
                 child: Text(
                   _selectedTime == null
                       ? 'Select Time'
                       : 'Selected Time: ${_selectedTime!.format(context)}',
-                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
                 ),
               ),
-              SizedBox(height: 20),
-              TextButton(
+              SizedBox(height: 16), // Space between time button and confirm
+              // Confirm button
+              ElevatedButton(
                 onPressed: _saveAppointment,
-                child: Text(
-                  'Confirm Appointment',
-                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Color(0xFFE5D9F2),
+                  backgroundColor: Color(0xFF615792),
+                  minimumSize: Size(200, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                 ),
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text('Confirm Appointment'),
               ),
-              if (_isLoading) CircularProgressIndicator(),
             ],
           ),
         ),

@@ -139,7 +139,7 @@ class _SignInPageState extends State<SignInPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'),
+            image: AssetImage('assets/609.png'),
             fit: BoxFit.cover,
           ),
         ),
