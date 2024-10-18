@@ -132,94 +132,100 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<void> _saveAppointment() async {
-    if (_selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select a time.")),
-      );
-      return;
-    }
+  if (_selectedTime == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please select a time.")),
+    );
+    return;
+  }
 
-    setState(() {
-      _isLoading = true;
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    final user = Supabase.instance.client.auth.currentUser;
+  final user = Supabase.instance.client.auth.currentUser;
 
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User is not authenticated.")),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
-    double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
-    if (parsedPrice == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Invalid price format.")),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
-    String? checkoutUrl = await _makePayment(parsedPrice);
-    if (checkoutUrl == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment failed. Please try again.")),
-      );
-      setState(() {
-        _isLoading = false;
-      });
-      return;
-    }
-
-    if (await canLaunch(checkoutUrl)) {
-      await launch(checkoutUrl);
-    } else {
-      throw 'Could not launch $checkoutUrl';
-    }
-
-    final response = await Supabase.instance.client
-        .from('appointments')
-        .insert({
-          'service': widget.service,
-          'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
-          'time': _selectedTime!.format(context),
-          'price': parsedPrice,
-          'user_id': user.id,
-        })
-        .execute();
-
-    if (response.status == 201) {
-      await _fetchBookedAppointments();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ReceiptPage(
-            service: widget.service,
-            date: _selectedDay,
-            time: _selectedTime!,
-            price: widget.price,
-          ),
-        ),
-      );
-    } else {
-      final errorMessage = response.data != null
-          ? response.data['message'] ?? 'Unknown error occurred.'
-          : 'Unknown error occurred.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving appointment: $errorMessage")),
-      );
-    }
-
+  if (user == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("User is not authenticated.")),
+    );
     setState(() {
       _isLoading = false;
     });
+    return;
   }
+
+  // Get the user's email
+  final String? email = user.email;
+
+  double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
+  if (parsedPrice == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Invalid price format.")),
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    return;
+  }
+
+  String? checkoutUrl = await _makePayment(parsedPrice);
+  if (checkoutUrl == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Payment failed. Please try again.")),
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    return;
+  }
+
+  if (await canLaunch(checkoutUrl)) {
+    await launch(checkoutUrl);
+  } else {
+    throw 'Could not launch $checkoutUrl';
+  }
+
+  // Insert the appointment into Supabase with the user's email
+  final response = await Supabase.instance.client
+      .from('appointments')
+      .insert({
+        'service': widget.service,
+        'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
+        'time': _selectedTime!.format(context),
+        'price': parsedPrice,
+        'user_id': user.id,
+        'email': email,  // Include the user's email here
+      })
+      .execute();
+
+  if (response.status == 201) {
+    await _fetchBookedAppointments();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ReceiptPage(
+          service: widget.service,
+          date: _selectedDay,
+          time: _selectedTime!,
+          price: widget.price,
+        ),
+      ),
+    );
+  } else {
+    final errorMessage = response.data != null
+        ? response.data['message'] ?? 'Unknown error occurred.'
+        : 'Unknown error occurred.';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error saving appointment: $errorMessage")),
+    );
+  }
+
+  setState(() {
+    _isLoading = false;
+  });
+}
+
 
   Future<void> _selectTime() async {
     TimeOfDay? picked = await showTimePicker(
