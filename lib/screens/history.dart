@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:queueteeth/screens/paymango_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:ui';
-
 import 'package:url_launcher/url_launcher.dart'; // Import for BackdropFilter
 
 class HistoryPage extends StatefulWidget {
@@ -35,7 +34,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
     final response = await supabase
         .from('appointments')
-        .select('service, date, time, price, status')
+        .select('id::text, service, date, time, price, status') // Fetch 'id' as a String (text)
         .eq('user_id', user.id)
         .order('date', ascending: false)
         .execute();
@@ -52,11 +51,34 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  Future<void> _handlePayment(double price, String description) async {
+  Future<void> _handlePayment(double price, String description, String appointmentId) async {
     final checkoutUrl = await payMongoService.createPaymentIntent(price, description);
     if (checkoutUrl != null) {
       if (await canLaunch(checkoutUrl)) {
         await launch(checkoutUrl);
+        
+        // Assuming the payment was successful (replace this with actual confirmation logic)
+        bool paymentSuccess = true;
+
+        if (paymentSuccess) {
+          // Update the database to reflect the payment status
+          final response = await supabase
+              .from('appointments')
+              .update({'status': 'Paid'}) // Update status to 'Paid'
+              .eq('id', appointmentId) // Update specific appointment by ID (as String)
+              .execute();
+
+          if (response.error == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Payment successful! Status updated.')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Payment successful, but failed to update status.')),
+            );
+            print('Database update error: ${response.error!.message}');
+          }
+        }
       } else {
         throw 'Could not launch $checkoutUrl';
       }
@@ -204,7 +226,8 @@ class _HistoryPageState extends State<HistoryPage> {
                                 onPressed: () {
                                   final price = double.parse(patient['price'].toString());
                                   final description = 'Payment for ${patient['service']} on ${patient['date']}';
-                                  _handlePayment(price, description); // Call the payment function with both arguments
+                                  final appointmentId = patient['id'].toString(); // Convert the ID to String
+                                  _handlePayment(price, description, appointmentId); // Pass appointment ID as String
                                 },
                                 child: const Text('Pay'),
                               ),
@@ -232,6 +255,8 @@ class _HistoryPageState extends State<HistoryPage> {
         return Colors.orange;
       case 'Cancelled':
         return Colors.red;
+      case 'Paid':
+        return Colors.blue;
       default:
         return Colors.black54;
     }
