@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:queueteeth/screens/profile.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -24,7 +25,7 @@ class SettingsPage extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward),
               onTap: () {
                 // Navigate to the profile edit page or implement functionality
-                // For example: Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage()));
               },
             ),
             ListTile(

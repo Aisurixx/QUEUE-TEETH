@@ -74,84 +74,81 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<void> _saveAppointment() async {
-  if (_selectedTime == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please select a time.")),
-    );
-    return;
-  }
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select a time.")),
+      );
+      return;
+    }
 
-  setState(() {
-    _isLoading = true;
-  });
-
-  final user = Supabase.instance.client.auth.currentUser;
-
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("User is not authenticated.")),
-    );
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
-    return;
-  }
 
-  // Get the user's email
-  final String? email = user.email;
+    final user = Supabase.instance.client.auth.currentUser;
 
-  double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
-  if (parsedPrice == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Invalid price format.")),
-    );
-    setState(() {
-      _isLoading = false;
-    });
-    return;
-  }
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User is not authenticated.")),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
 
-  // Insert the appointment into Supabase with status 'pending'
-  final response = await Supabase.instance.client
-      .from('appointments')
-      .insert({
-        'service': widget.service,
-        'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
-        'time': _selectedTime!.format(context),
-        'price': parsedPrice,
-        'user_id': user.id,
-        'email': email,  // Include the user's email here
-        'status': 'pending',  // Default status as 'pending'
-      })
-      .execute();
+    final String? email = user.email;
 
-  if (response.status == 201) {
-    await _fetchBookedAppointments();
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ReceiptPage(
-          service: widget.service,
-          date: _selectedDay,
-          time: _selectedTime!,
-          price: widget.price,
+    double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
+    if (parsedPrice == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid price format.")),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    final response = await Supabase.instance.client
+        .from('appointments')
+        .insert({
+          'service': widget.service,
+          'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
+          'time': _selectedTime!.format(context),
+          'price': parsedPrice,
+          'user_id': user.id,
+          'email': email,
+          'status': 'pending',
+        })
+        .execute();
+
+    if (response.status == 201) {
+      await _fetchBookedAppointments();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReceiptPage(
+            service: widget.service,
+            date: _selectedDay,
+            time: _selectedTime!,
+            price: widget.price,
+          ),
         ),
-      ),
-    );
-  } else {
-    final errorMessage = response.data != null
-        ? response.data['message'] ?? 'Unknown error occurred.'
-        : 'Unknown error occurred.';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error saving appointment: $errorMessage")),
-    );
+      );
+    } else {
+      final errorMessage = response.data != null
+          ? response.data['message'] ?? 'Unknown error occurred.'
+          : 'Unknown error occurred.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving appointment: $errorMessage")),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
-
-  setState(() {
-    _isLoading = false;
-  });
-}
-
 
   Future<void> _selectTime() async {
     TimeOfDay? picked = await showTimePicker(
@@ -171,10 +168,10 @@ class _CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         title: Text(
           'Book Appointment',
-          style: TextStyle(color: Color(0xFFE5D9F2)), // Set AppBar text color
+          style: TextStyle(color: Color(0xFFE5D9F2)), 
         ),
-        backgroundColor: Colors.blueAccent, // Optional: Set AppBar background color
-        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)), // Set back button color
+        backgroundColor: Colors.blueAccent, 
+        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)),
         flexibleSpace: Image.asset(
           'assets/appbar.png',
           fit: BoxFit.cover,
@@ -183,21 +180,20 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Background image
-            fit: BoxFit.cover, // Cover the entire screen
+            image: AssetImage('assets/splash.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Container for the date selection area with a white background
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white, // White background
-                  borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                padding: EdgeInsets.all(16.0), // Padding around the calendar
+                padding: EdgeInsets.all(16.0),
                 child: TableCalendar(
                   focusedDay: _focusedDay,
                   selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -207,7 +203,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       _focusedDay = focusedDay;
                     });
                   },
-                  firstDay: DateTime.now(), // Disable past dates
+                  firstDay: DateTime.now(),
                   lastDay: DateTime.now().add(Duration(days: 365)),
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
@@ -225,23 +221,57 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               ),
               SizedBox(height: 20),
-              TextButton(
-                onPressed: _selectTime,
-                child: Text(
-                  _selectedTime == null
-                      ? 'Select Time'
-                      : 'Selected Time: ${_selectedTime!.format(context)}',
-                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
-                ),
-              ),
+              // "Select Time" button with a narrower width and gradient
+             TextButton(
+  onPressed: _selectTime,
+  style: TextButton.styleFrom(
+    padding: EdgeInsets.zero,
+  ),
+  child: Container(
+    width: 200, // Adjusted width
+    padding: EdgeInsets.symmetric(vertical: 12),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Color(0xFF615792), Color(0xFFE5D9F2)],
+      ),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Center(
+      child: Text(
+        _selectedTime == null
+            ? 'Select Time'
+            : 'Selected Time: ${_selectedTime!.format(context)}',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ),
+),
+
               SizedBox(height: 20),
-              TextButton(
-                onPressed: _saveAppointment,
-                child: Text(
-                  'Confirm Appointment',
-                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
-                ),
-              ),
+              // "Confirm Appointment" button with a narrower width and gradient
+             TextButton(
+  onPressed: _saveAppointment,
+  style: TextButton.styleFrom(
+    padding: EdgeInsets.zero,
+  ),
+  child: Container(
+    width: 200, // Adjusted width
+    padding: EdgeInsets.symmetric(vertical: 12),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Color(0xFF615792), Color(0xFFE5D9F2)],
+      ),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Center(
+      child: Text(
+        'Confirm Appointment',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ),
+),
+
               if (_isLoading) CircularProgressIndicator(),
             ],
           ),

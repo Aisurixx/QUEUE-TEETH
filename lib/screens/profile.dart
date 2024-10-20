@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queueteeth/home.dart';
 import 'package:queueteeth/login.dart';
+import 'package:queueteeth/screens/SettingsPage.dart';
 
 class ProfilePage extends StatelessWidget {
   final String imagePath = 'assets/pogisivenz.png';
@@ -27,7 +28,7 @@ class ProfilePage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage()), // Navigate directly to the home screen
+                  MaterialPageRoute(builder: (context) => SettingsPage()), // Navigate directly to the home screen
                 );
               },
             ),

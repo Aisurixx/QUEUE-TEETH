@@ -43,7 +43,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your App Title'), // Replace with your app title
+        title: const Text('Vidal Queue-Teeth'), // Replace with your app title
+
         actions: [
           IconButton(
             icon: const Icon(Icons.settings), // Settings icon

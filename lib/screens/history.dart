@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:queueteeth/screens/paymango_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:ui';
-import 'package:url_launcher/url_launcher.dart'; // Import for BackdropFilter
+import 'package:url_launcher/url_launcher.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -14,7 +14,7 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   final SupabaseClient supabase = Supabase.instance.client;
   List<Map<String, dynamic>> patientHistory = [];
-  final PayMongoService payMongoService = PayMongoService(); // Create PayMongoService instance
+  final PayMongoService payMongoService = PayMongoService();
 
   @override
   void initState() {
@@ -27,14 +27,14 @@ class _HistoryPageState extends State<HistoryPage> {
 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User is not authenticated.")),
+        const SnackBar(content: Text("User is not authenticated.")),
       );
       return;
     }
 
     final response = await supabase
         .from('appointments')
-        .select('id::text, service, date, time, price, status') // Fetch 'id' as a String (text)
+        .select('id::text, service, date, time, price, status')
         .eq('user_id', user.id)
         .order('date', ascending: false)
         .execute();
@@ -44,7 +44,6 @@ class _HistoryPageState extends State<HistoryPage> {
         patientHistory = (response.data as List).cast<Map<String, dynamic>>();
       });
     } else {
-      print('Error fetching patient history: ${response.error!.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching history: ${response.error!.message}')),
       );
@@ -56,27 +55,25 @@ class _HistoryPageState extends State<HistoryPage> {
     if (checkoutUrl != null) {
       if (await canLaunch(checkoutUrl)) {
         await launch(checkoutUrl);
-        
+
         // Assuming the payment was successful (replace this with actual confirmation logic)
         bool paymentSuccess = true;
 
         if (paymentSuccess) {
-          // Update the database to reflect the payment status
           final response = await supabase
               .from('appointments')
-              .update({'status': 'Paid'}) // Update status to 'Paid'
-              .eq('id', appointmentId) // Update specific appointment by ID (as String)
+              .update({'status': 'Paid'})
+              .eq('id', appointmentId)
               .execute();
 
           if (response.error == null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Payment successful! Status updated.')),
+              const SnackBar(content: Text('Payment successful! Status updated.')),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Payment successful, but failed to update status.')),
+              const SnackBar(content: Text('Payment successful, but failed to update status.')),
             );
-            print('Database update error: ${response.error!.message}');
           }
         }
       } else {
@@ -84,7 +81,7 @@ class _HistoryPageState extends State<HistoryPage> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create payment intent.')),
+        const SnackBar(content: Text('Failed to create payment intent.')),
       );
     }
   }
@@ -92,30 +89,6 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: AppBar(
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/appbar.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          centerTitle: true,
-          title: const Text(
-            'History',
-            style: TextStyle(
-              color: Color(0xFFE5D9F2),
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto',
-            ),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-      ),
       body: Stack(
         children: [
           Positioned.fill(
@@ -126,7 +99,25 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
           Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+              // History Title with Background Image (replacing the AppBar)
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                width: double.infinity,
+                child: Center(
+                  child: Text(
+                    'History',
+                    style: TextStyle(
+                      color: Color(0xFFE5D9F2),
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Services and Appointments Box
               Container(
                 width: double.infinity,
                 height: 100,
@@ -168,6 +159,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ),
               const SizedBox(height: 10),
+              // Patient History List
               Expanded(
                 child: ListView.builder(
                   itemCount: patientHistory.length,
@@ -219,15 +211,14 @@ class _HistoryPageState extends State<HistoryPage> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            // Show the Pay button only if the status is "Confirmed"
                             if (patient['status'].toString() == 'Confirmed') ...[
                               const SizedBox(height: 10),
                               ElevatedButton(
                                 onPressed: () {
                                   final price = double.parse(patient['price'].toString());
                                   final description = 'Payment for ${patient['service']} on ${patient['date']}';
-                                  final appointmentId = patient['id'].toString(); // Convert the ID to String
-                                  _handlePayment(price, description, appointmentId); // Pass appointment ID as String
+                                  final appointmentId = patient['id'].toString();
+                                  _handlePayment(price, description, appointmentId);
                                 },
                                 child: const Text('Pay'),
                               ),
