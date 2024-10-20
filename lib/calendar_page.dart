@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart';
 import 'receipt_page.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -23,8 +20,6 @@ class _CalendarPageState extends State<CalendarPage> {
   TimeOfDay? _selectedTime;
   bool _isLoading = false;
   Map<DateTime, List<TimeOfDay>> _bookedAppointments = {};
-  
-  String? _paymentId;
 
   @override
   void initState() {
@@ -78,59 +73,6 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  Future<String?> _makePayment(double amount) async {
-    final String paymongoUrl = 'https://api.paymongo.com/v1/links';
-    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN';
-
-    final response = await http.post(
-      Uri.parse(paymongoUrl),
-      headers: {
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKey:'))}',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'data': {
-          'attributes': {
-            'amount': (amount * 100).toInt(),
-            'currency': 'PHP',
-            'payment_method_allowed': ['gcash', 'card'],
-            'description': 'Payment for ${widget.service} on ${DateFormat('yyyy-MM-dd').format(_selectedDay)} at ${_selectedTime!.format(context)}',
-          },
-        },
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      _paymentId = responseData['data']['id'];
-      return responseData['data']['attributes']['checkout_url'];
-    } else {
-      print('Payment intent creation failed: ${response.body}');
-      return null;
-    }
-  }
-
-  Future<bool> _checkPaymentStatus(String paymentId) async {
-    final String paymongoPaymentUrl = 'https://api.paymongo.com/v1/payments/$paymentId';
-    final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN';
-
-    final response = await http.get(
-      Uri.parse(paymongoPaymentUrl),
-      headers: {
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKey:'))}',
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      return responseData['data']['attributes']['status'] == 'paid';
-    } else {
-      print('Payment status check failed: ${response.body}');
-      return false;
-    }
-  }
-
   Future<void> _saveAppointment() async {
   if (_selectedTime == null) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -169,24 +111,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return;
   }
 
-  String? checkoutUrl = await _makePayment(parsedPrice);
-  if (checkoutUrl == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Payment failed. Please try again.")),
-    );
-    setState(() {
-      _isLoading = false;
-    });
-    return;
-  }
-
-  if (await canLaunch(checkoutUrl)) {
-    await launch(checkoutUrl);
-  } else {
-    throw 'Could not launch $checkoutUrl';
-  }
-
-  // Insert the appointment into Supabase with the user's email
+  // Insert the appointment into Supabase with status 'pending'
   final response = await Supabase.instance.client
       .from('appointments')
       .insert({
@@ -196,6 +121,7 @@ class _CalendarPageState extends State<CalendarPage> {
         'price': parsedPrice,
         'user_id': user.id,
         'email': email,  // Include the user's email here
+        'status': 'pending',  // Default status as 'pending'
       })
       .execute();
 
@@ -274,23 +200,23 @@ class _CalendarPageState extends State<CalendarPage> {
                 padding: EdgeInsets.all(16.0), // Padding around the calendar
                 child: TableCalendar(
                   focusedDay: _focusedDay,
-  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-  onDaySelected: (selectedDay, focusedDay) {
-    setState(() {
-      _selectedDay = selectedDay;
-      _focusedDay = focusedDay;
-    });
-  },
-  firstDay: DateTime.now(), // Disable past dates
-  lastDay: DateTime.now().add(Duration(days: 365)),
-  calendarStyle: CalendarStyle(
-    todayDecoration: BoxDecoration(
-      color: Colors.blueAccent,
-      shape: BoxShape.circle,
-    ),
-    selectedDecoration: BoxDecoration(
-      color: Colors.blue,
-      shape: BoxShape.circle,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  firstDay: DateTime.now(), // Disable past dates
+                  lastDay: DateTime.now().add(Duration(days: 365)),
+                  calendarStyle: CalendarStyle(
+                    todayDecoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      shape: BoxShape.circle,
+                    ),
+                    selectedDecoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
                     ),
                   ),
                   headerStyle: HeaderStyle(

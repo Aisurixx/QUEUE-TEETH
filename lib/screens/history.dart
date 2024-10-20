@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:queueteeth/screens/paymango_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:ui'; // Import for BackdropFilter
+import 'dart:ui';
+
+import 'package:url_launcher/url_launcher.dart'; // Import for BackdropFilter
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -11,7 +14,8 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   final SupabaseClient supabase = Supabase.instance.client;
-  List<Map<String, dynamic>> patientHistory = [];  // Update to dynamic
+  List<Map<String, dynamic>> patientHistory = [];
+  final PayMongoService payMongoService = PayMongoService(); // Create PayMongoService instance
 
   @override
   void initState() {
@@ -20,33 +24,45 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> _fetchPatientHistory() async {
-    // Get the current authenticated user
     final user = supabase.auth.currentUser;
 
     if (user == null) {
-      // If the user is not authenticated, return or show an error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("User is not authenticated.")),
       );
       return;
     }
 
-    // Fetch appointments for the authenticated user and order by date (newest first)
     final response = await supabase
         .from('appointments')
-        .select('service, date, time, price')
-        .eq('user_id', user.id) // Filter by user_id
-        .order('date', ascending: false)  // Sort by date in descending order
+        .select('service, date, time, price, status')
+        .eq('user_id', user.id)
+        .order('date', ascending: false)
         .execute();
 
     if (response.error == null) {
       setState(() {
-        patientHistory = (response.data as List).cast<Map<String, dynamic>>(); // Update to cast to List<Map<String, dynamic>>
+        patientHistory = (response.data as List).cast<Map<String, dynamic>>();
       });
     } else {
       print('Error fetching patient history: ${response.error!.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching history: ${response.error!.message}')),
+      );
+    }
+  }
+
+  Future<void> _handlePayment(double price, String description) async {
+    final checkoutUrl = await payMongoService.createPaymentIntent(price, description);
+    if (checkoutUrl != null) {
+      if (await canLaunch(checkoutUrl)) {
+        await launch(checkoutUrl);
+      } else {
+        throw 'Could not launch $checkoutUrl';
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create payment intent.')),
       );
     }
   }
@@ -89,7 +105,6 @@ class _HistoryPageState extends State<HistoryPage> {
           Column(
             children: [
               const SizedBox(height: 20),
-              // Glassmorphism container with BackdropFilter
               Container(
                 width: double.infinity,
                 height: 100,
@@ -100,13 +115,13 @@ class _HistoryPageState extends State<HistoryPage> {
                   border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0), // Ensures child is also rounded
+                  borderRadius: BorderRadius.circular(10.0),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Blur effect
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
-                      width: double.infinity, // Fill width
-                      height: double.infinity, // Fill height
-                      color: Colors.white.withOpacity(0), // Semi-transparent background
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.white.withOpacity(0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: const [
@@ -130,9 +145,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
               Expanded(
                 child: ListView.builder(
                   itemCount: patientHistory.length,
@@ -140,14 +153,14 @@ class _HistoryPageState extends State<HistoryPage> {
                     final patient = patientHistory[index];
                     return Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5), // Semi-transparent white for glass effect
+                        color: Colors.white.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                       child: ListTile(
                         leading: const Icon(Icons.account_circle, size: 40.0, color: Colors.white),
                         title: Text(
-                          patient['service'].toString(),  // Use .toString() for dynamic values
+                          patient['service'].toString(),
                           style: const TextStyle(
                             color: Colors.black87,
                             fontFamily: 'Roboto',
@@ -157,26 +170,45 @@ class _HistoryPageState extends State<HistoryPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Date: ${patient['date'].toString()}',  // Use .toString() for dynamic values
+                              'Date: ${patient['date'].toString()}',
                               style: const TextStyle(
                                 color: Colors.black54,
                                 fontFamily: 'Roboto',
                               ),
                             ),
                             Text(
-                              'Time: ${patient['time'].toString()}',  // Use .toString() for dynamic values
+                              'Time: ${patient['time'].toString()}',
                               style: const TextStyle(
                                 color: Colors.black54,
                                 fontFamily: 'Roboto',
                               ),
                             ),
                             Text(
-                              'Price: ${patient['price'].toString()}',  // Use .toString() for dynamic values
+                              'Price: ${patient['price'].toString()}',
                               style: const TextStyle(
                                 color: Colors.black54,
                                 fontFamily: 'Roboto',
                               ),
                             ),
+                            Text(
+                              'Status: ${patient['status'].toString()}',
+                              style: TextStyle(
+                                color: _getStatusColor(patient['status'].toString()),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            // Show the Pay button only if the status is "Confirmed"
+                            if (patient['status'].toString() == 'Confirmed') ...[
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  final price = double.parse(patient['price'].toString());
+                                  final description = 'Payment for ${patient['service']} on ${patient['date']}';
+                                  _handlePayment(price, description); // Call the payment function with both arguments
+                                },
+                                child: const Text('Pay'),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -189,6 +221,20 @@ class _HistoryPageState extends State<HistoryPage> {
         ],
       ),
     );
+  }
+
+  // Helper method to determine the color of the status text
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Confirmed':
+        return Colors.green;
+      case 'Pending':
+        return Colors.orange;
+      case 'Cancelled':
+        return Colors.red;
+      default:
+        return Colors.black54;
+    }
   }
 }
 

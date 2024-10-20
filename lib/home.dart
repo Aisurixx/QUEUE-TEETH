@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/profile.dart';
+import 'screens/settingsPage.dart'; // Import the new settings page
 import 'home_screen.dart';
 import 'book_appointment.dart';
 import 'screens/history.dart';
-import 'package:custom_line_indicator_bottom_navbar/custom_line_indicator_bottom_navbar.dart'; // Import the required package
+import 'package:custom_line_indicator_bottom_navbar/custom_line_indicator_bottom_navbar.dart';
 
 void main() => runApp(const MyApp());
 
@@ -34,33 +34,46 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _widgetOptions = [
     HomeScreen(),          // Home Page
-    AppointmentPage(),      // Appointments Page
-    HistoryPage(),          // History Page
-    ProfilePage(),          // Profile Page
+    AppointmentPage(),     // Appointments Page
+    HistoryPage(),         // History Page
+    // ProfilePage(),      // Removed Profile Page
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Removed AppBar
+      appBar: AppBar(
+        title: const Text('Your App Title'), // Replace with your app title
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings), // Settings icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()), // Navigate to SettingsPage
+              );
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex), // Displaying the selected page
       ),
       bottomNavigationBar: CustomLineIndicatorBottomNavbar(
         selectedColor: Colors.purple,   // Selected item color
         unSelectedColor: Colors.black54, // Unselected item color
-        backgroundColor: Colors.white,  // Navbar background color
-        currentIndex: _selectedIndex,   // Current index for navigation
-        unselectedIconSize: 15,         // Unselected icon size
-        selectedIconSize: 20,           // Selected icon size
+        backgroundColor: Colors.white,    // Navbar background color
+        currentIndex: _selectedIndex,     // Current index for navigation
+        unselectedIconSize: 15,           // Unselected icon size
+        selectedIconSize: 20,             // Selected icon size
         onTap: (index) {
           setState(() {
-            _selectedIndex = index;     // Update the index when a tab is tapped
+            _selectedIndex = index;       // Update the index when a tab is tapped
           });
         },
-        enableLineIndicator: true,      // Enable line indicator
-        lineIndicatorWidth: 3,          // Line indicator width
-        indicatorType: IndicatorType.Top, // Line indicator at the top
+        enableLineIndicator: true,        // Enable line indicator
+        lineIndicatorWidth: 3,            // Line indicator width
+        indicatorType: IndicatorType.Top,  // Line indicator at the top
         customBottomBarItems: [
           CustomBottomBarItems(
             label: 'Home',
@@ -74,10 +87,7 @@ class _HomePageState extends State<HomePage> {
             label: 'History',
             icon: Icons.history_toggle_off_rounded, // History icon
           ),
-          CustomBottomBarItems(
-            label: 'Profile',
-            icon: Icons.person_2_rounded, // Profile icon
-          ),
+          // Removed Profile tab
         ],
       ),
     );
