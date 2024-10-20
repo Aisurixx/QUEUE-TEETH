@@ -1,75 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'screens/profile.dart';
 import 'home_screen.dart';
 import 'book_appointment.dart';
 import 'screens/history.dart';
-import 'screens/profile.dart'; // Add this line to import the profile page
+import 'package:custom_line_indicator_bottom_navbar/custom_line_indicator_bottom_navbar.dart'; // Import the required package
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const HomePage(),
+    );
+  }
+}
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  late PersistentTabController _controller;
+  int _selectedIndex = 0; // Default index for bottom navbar
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = PersistentTabController(initialIndex: 0); // Set initial index
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      HomeScreen(),
-      AppointmentPage(),
-      HistoryPage(),
-      ProfilePage(), // Add ProfilePage here
-    ];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.space_dashboard_outlined),
-        title: "Home",
-        activeColorPrimary: Colors.purple,
-        inactiveColorPrimary: Colors.black,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.event_available_outlined),
-        title: "Appointments",
-        activeColorPrimary: Colors.purple,
-        inactiveColorPrimary: Colors.black,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.history_toggle_off_outlined),
-        title: "History",
-        activeColorPrimary: Colors.purple,
-        inactiveColorPrimary: Colors.black,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.person_2_outlined),
-        title: "Profile",
-        activeColorPrimary: Colors.purple,
-        inactiveColorPrimary: Colors.black,
-      ),
-    ];
-  }
+  final List<Widget> _widgetOptions = [
+    HomeScreen(),          // Home Page
+    AppointmentPage(),      // Appointments Page
+    HistoryPage(),          // History Page
+    ProfilePage(),          // Profile Page
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: PersistentTabView(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        backgroundColor: Colors.white,
-        navBarHeight: 60, // Customize height as needed
-        padding: const EdgeInsets.only(top: 8),
-        navBarStyle: NavBarStyle.style9, // Choose your preferred style
+      // Removed AppBar
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex), // Displaying the selected page
+      ),
+      bottomNavigationBar: CustomLineIndicatorBottomNavbar(
+        selectedColor: Colors.purple,   // Selected item color
+        unSelectedColor: Colors.black54, // Unselected item color
+        backgroundColor: Colors.white,  // Navbar background color
+        currentIndex: _selectedIndex,   // Current index for navigation
+        unselectedIconSize: 15,         // Unselected icon size
+        selectedIconSize: 20,           // Selected icon size
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;     // Update the index when a tab is tapped
+          });
+        },
+        enableLineIndicator: true,      // Enable line indicator
+        lineIndicatorWidth: 3,          // Line indicator width
+        indicatorType: IndicatorType.Top, // Line indicator at the top
+        customBottomBarItems: [
+          CustomBottomBarItems(
+            label: 'Home',
+            icon: Icons.home, // Home icon
+          ),
+          CustomBottomBarItems(
+            label: 'Appointments',
+            icon: Icons.event_available_outlined, // Appointments icon
+          ),
+          CustomBottomBarItems(
+            label: 'History',
+            icon: Icons.history_toggle_off_rounded, // History icon
+          ),
+          CustomBottomBarItems(
+            label: 'Profile',
+            icon: Icons.person_2_rounded, // Profile icon
+          ),
+        ],
       ),
     );
   }

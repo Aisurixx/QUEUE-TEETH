@@ -47,6 +47,9 @@ dependencies:
   simple_floating_bottom_nav_bar: ^0.0.3
   fluid_bottom_nav_bar: ^1.4.0
   persistent_bottom_nav_bar: ^6.2.1
+  floating_frosted_bottom_bar: ^0.0.1
+  bottom_navbar_with_indicator: ^0.0.9
+  custom_line_indicator_bottom_navbar: ^0.0.8
  
 
 dev_dependencies:

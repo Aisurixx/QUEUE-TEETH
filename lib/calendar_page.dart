@@ -274,23 +274,23 @@ class _CalendarPageState extends State<CalendarPage> {
                 padding: EdgeInsets.all(16.0), // Padding around the calendar
                 child: TableCalendar(
                   focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  firstDay: DateTime.now().subtract(Duration(days: 365)),
-                  lastDay: DateTime.now().add(Duration(days: 365)),
-                  calendarStyle: CalendarStyle(
-                    todayDecoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      shape: BoxShape.circle,
-                    ),
-                    selectedDecoration: BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
+  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+  onDaySelected: (selectedDay, focusedDay) {
+    setState(() {
+      _selectedDay = selectedDay;
+      _focusedDay = focusedDay;
+    });
+  },
+  firstDay: DateTime.now(), // Disable past dates
+  lastDay: DateTime.now().add(Duration(days: 365)),
+  calendarStyle: CalendarStyle(
+    todayDecoration: BoxDecoration(
+      color: Colors.blueAccent,
+      shape: BoxShape.circle,
+    ),
+    selectedDecoration: BoxDecoration(
+      color: Colors.blue,
+      shape: BoxShape.circle,
                     ),
                   ),
                   headerStyle: HeaderStyle(

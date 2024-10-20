@@ -105,20 +105,31 @@ class AppointmentPage extends StatelessWidget {
                                 );
                               },
                               child: Container(
-                                height: 40.0, // Set a fixed height for the button
+                                height: 50.0, // Increased height for better usability
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFE5D9F2),
-                                  borderRadius: BorderRadius.circular(30.0), // Increased border radius
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xFF615792), Color(0xFFE5D9F2)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 5.0,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0), // Reduced horizontal padding
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0), // Increased padding for better spacing
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         service,
                                         style: TextStyle(
-                                          color: Colors.black,
+                                          color: const Color.fromARGB(255, 255, 255, 255),
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -147,7 +158,7 @@ class AppointmentPage extends StatelessWidget {
               ),
             ),
           ),
-        ],
+        ],   
       ),
     );
   }
