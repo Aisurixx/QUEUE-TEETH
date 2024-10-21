@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:queueteeth/home.dart';
 import 'package:queueteeth/login.dart';
 import 'package:queueteeth/screens/SettingsPage.dart';
 
