@@ -1,7 +1,6 @@
 import 'dart:ui'; // Import this for BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:queueteeth/home.dart';
-// Import the home screen
+import 'package:queueteeth/home.dart'; // Import the home screen
 
 class ReceiptPage extends StatelessWidget {
   final String service;
@@ -19,10 +18,6 @@ class ReceiptPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Receipt"),
-        automaticallyImplyLeading: false, // Remove the back button
-      ),
       body: Stack(
         children: [
           // Background image
@@ -39,6 +34,15 @@ class ReceiptPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // "Receipt" text
+                  Text(
+                    "Receipt",
+                    style: TextStyle(
+                      fontSize: 30, // Adjust the font size as needed
+                      color: Color(0xFFE5D9F2), // Set text color
+                    ),
+                  ),
+                  SizedBox(height: 20), // Space between the title and content
                   // Glassmorphism effect
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0), // Rounded corners
@@ -67,18 +71,34 @@ class ReceiptPage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate to HomeScreen
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                        (route) => false, // Removes all previous routes
-                      );
-                    },
-                    child: Text(
-                      "Back to Home",
-                      style: TextStyle(color: Colors.black), // Set button text color to black
+                  // Button with smaller width
+                  Container(
+                    width: 200, // Adjust the width as needed
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF615792), Color(0xFFE5D9F2)], // Gradient colors
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10), // Rounded corners for the button
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent, // Make button background transparent to show the gradient
+                        shadowColor: Colors.transparent, // Remove shadow to maintain the gradient effect
+                      ),
+                      onPressed: () {
+                        // Navigate to HomeScreen
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                          (route) => false, // Removes all previous routes
+                        );
+                      },
+                      child: Text(
+                        "Back to Home",
+                        style: TextStyle(color: Colors.black), // Set button text color to black
+                      ),
                     ),
                   ),
                 ],

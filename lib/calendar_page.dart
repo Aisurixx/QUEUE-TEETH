@@ -30,48 +30,81 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<void> _fetchBookedAppointments() async {
-    setState(() {
-      _isLoading = true;
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    try {
-      final response = await Supabase.instance.client
-          .from('appointments')
-          .select('date, time')
-          .execute();
+  try {
+    final response = await Supabase.instance.client
+        .from('appointments')
+        .select('date, time')
+        .execute();
 
-      if (response.status == 200) {
-        final List<dynamic> data = response.data;
-        setState(() {
-          for (var item in data) {
-            DateTime date = DateTime.parse(item['date']);
-            TimeOfDay time = TimeOfDay(
-              hour: int.parse(item['time'].split(':')[0]),
-              minute: int.parse(item['time'].split(':')[1]),
-            );
-            if (_bookedAppointments.containsKey(date)) {
-              _bookedAppointments[date]!.add(time);
-            } else {
-              _bookedAppointments[date] = [time];
-            }
-          }
-        });
-      } else {
-        final errorMessage = response.data != null
-            ? response.data['message'] ?? 'Unknown error occurred.'
-            : 'Error fetching booked appointments.';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching booked appointments: $errorMessage")),
-        );
-      }
-    } catch (e) {
-      print("Error: $e");
-    } finally {
+    if (response.status == 200) {
+      final List<dynamic> data = response.data;
       setState(() {
-        _isLoading = false;
+        for (var item in data) {
+          DateTime date = DateTime.parse(item['date']);
+          String timeString = item['time'];
+
+          // Add a check to ensure the time format is valid
+          try {
+            // Parse the 12-hour time format
+            final timeParts = timeString.split(' ');
+            if (timeParts.length == 2) {
+              final time = timeParts[0].split(':');
+              if (time.length == 2) {
+                int hour = int.parse(time[0]);
+                int minute = int.parse(time[1]);
+                String period = timeParts[1]; // AM or PM
+
+                // Convert to 24-hour format
+                if (period.toUpperCase() == 'PM' && hour < 12) {
+                  hour += 12; // Convert PM hour to 24-hour format
+                } else if (period.toUpperCase() == 'AM' && hour == 12) {
+                  hour = 0; // Convert 12 AM to 0 hours
+                }
+
+                // Ensure hour and minute are within valid ranges
+                if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+                  TimeOfDay timeOfDay = TimeOfDay(hour: hour, minute: minute);
+                  if (_bookedAppointments.containsKey(date)) {
+                    _bookedAppointments[date]!.add(timeOfDay);
+                  } else {
+                    _bookedAppointments[date] = [timeOfDay];
+                  }
+                } else {
+                  throw FormatException("Invalid time value: $timeString");
+                }
+              } else {
+                throw FormatException("Invalid time format: $timeString");
+              }
+            } else {
+              throw FormatException("Invalid time format: $timeString");
+            }
+          } catch (e) {
+            print("Error parsing time: $timeString. Error: $e");
+          }
+        }
       });
+    } else {
+      final errorMessage = response.data != null
+          ? response.data['message'] ?? 'Unknown error occurred.'
+          : 'Error fetching booked appointments.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching booked appointments: $errorMessage")),
+      );
     }
+  } catch (e) {
+    print("Error: $e");
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
+
 
   Future<void> _saveAppointment() async {
   if (_selectedTime == null) {
@@ -97,7 +130,29 @@ class _CalendarPageState extends State<CalendarPage> {
     return;
   }
 
-  // Get the user's email
+  // Calculate the start and end of the week for the selected day
+  DateTime startOfWeek = _selectedDay.subtract(Duration(days: _selectedDay.weekday - 1));
+  DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+
+  // Check if there is already an appointment booked in the same week
+  final response = await Supabase.instance.client
+      .from('appointments')
+      .select('date')
+      .eq('user_id', user.id)
+      .gte('date', DateFormat('yyyy-MM-dd').format(startOfWeek))
+      .lte('date', DateFormat('yyyy-MM-dd').format(endOfWeek))
+      .execute();
+
+  if (response.status == 200 && response.data != null && (response.data as List).isNotEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("You can only book one appointment per week.")),
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    return;
+  }
+
   final String? email = user.email;
 
   double? parsedPrice = double.tryParse(widget.price.replaceAll('₱', '').replaceAll(',', ''));
@@ -111,8 +166,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return;
   }
 
-  // Insert the appointment into Supabase with status 'pending'
-  final response = await Supabase.instance.client
+  final insertResponse = await Supabase.instance.client
       .from('appointments')
       .insert({
         'service': widget.service,
@@ -120,12 +174,12 @@ class _CalendarPageState extends State<CalendarPage> {
         'time': _selectedTime!.format(context),
         'price': parsedPrice,
         'user_id': user.id,
-        'email': email,  // Include the user's email here
-        'status': 'pending',  // Default status as 'pending'
+        'email': email,
+        'status': 'pending',
       })
       .execute();
 
-  if (response.status == 201) {
+  if (insertResponse.status == 201) {
     await _fetchBookedAppointments();
     Navigator.push(
       context,
@@ -139,8 +193,8 @@ class _CalendarPageState extends State<CalendarPage> {
       ),
     );
   } else {
-    final errorMessage = response.data != null
-        ? response.data['message'] ?? 'Unknown error occurred.'
+    final errorMessage = insertResponse.data != null
+        ? insertResponse.data['message'] ?? 'Unknown error occurred.'
         : 'Unknown error occurred.';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Error saving appointment: $errorMessage")),
@@ -171,10 +225,10 @@ class _CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         title: Text(
           'Book Appointment',
-          style: TextStyle(color: Color(0xFFE5D9F2)), // Set AppBar text color
+          style: TextStyle(color: Color(0xFFE5D9F2)), 
         ),
-        backgroundColor: Colors.blueAccent, // Optional: Set AppBar background color
-        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)), // Set back button color
+        backgroundColor: Colors.blueAccent, 
+        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)),
         flexibleSpace: Image.asset(
           'assets/appbar.png',
           fit: BoxFit.cover,
@@ -183,21 +237,20 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/splash.png'), // Background image
-            fit: BoxFit.cover, // Cover the entire screen
+            image: AssetImage('assets/splash.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Container for the date selection area with a white background
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white, // White background
-                  borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                padding: EdgeInsets.all(16.0), // Padding around the calendar
+                padding: EdgeInsets.all(16.0),
                 child: TableCalendar(
                   focusedDay: _focusedDay,
                   selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -207,7 +260,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       _focusedDay = focusedDay;
                     });
                   },
-                  firstDay: DateTime.now(), // Disable past dates
+                  firstDay: DateTime.now(),
                   lastDay: DateTime.now().add(Duration(days: 365)),
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
@@ -225,23 +278,57 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               ),
               SizedBox(height: 20),
-              TextButton(
-                onPressed: _selectTime,
-                child: Text(
-                  _selectedTime == null
-                      ? 'Select Time'
-                      : 'Selected Time: ${_selectedTime!.format(context)}',
-                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
-                ),
-              ),
+              // "Select Time" button with a narrower width and gradient
+             TextButton(
+  onPressed: _selectTime,
+  style: TextButton.styleFrom(
+    padding: EdgeInsets.zero,
+  ),
+  child: Container(
+    width: 200, // Adjusted width
+    padding: EdgeInsets.symmetric(vertical: 12),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Color(0xFF615792), Color(0xFFE5D9F2)],
+      ),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Center(
+      child: Text(
+        _selectedTime == null
+            ? 'Select Time'
+            : 'Selected Time: ${_selectedTime!.format(context)}',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ),
+),
+
               SizedBox(height: 20),
-              TextButton(
-                onPressed: _saveAppointment,
-                child: Text(
-                  'Confirm Appointment',
-                  style: TextStyle(color: Color(0xFFE5D9F2)), // Set text color
-                ),
-              ),
+              // "Confirm Appointment" button with a narrower width and gradient
+             TextButton(
+  onPressed: _saveAppointment,
+  style: TextButton.styleFrom(
+    padding: EdgeInsets.zero,
+  ),
+  child: Container(
+    width: 200, // Adjusted width
+    padding: EdgeInsets.symmetric(vertical: 12),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Color(0xFF615792), Color(0xFFE5D9F2)],
+      ),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Center(
+      child: Text(
+        'Confirm Appointment',
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ),
+),
+
               if (_isLoading) CircularProgressIndicator(),
             ],
           ),
