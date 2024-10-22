@@ -36,7 +36,7 @@ class ReceiptPage extends StatelessWidget {
                 children: [
                   // "Receipt" text
                   Text(
-                    "Receipt",
+                    "Appointment Fee",
                     style: TextStyle(
                       fontSize: 30, // Adjust the font size as needed
                       color: Color(0xFFE5D9F2), // Set text color
