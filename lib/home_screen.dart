@@ -1,4 +1,3 @@
-import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart'; // For date formatting
@@ -9,7 +8,7 @@ class HomeScreen extends StatelessWidget {
   static const String noAppointmentsMessage = 'No upcoming appointments';
   static const String errorMessage = 'Error: ';
   static const double appBarHeight = 60.0;
-  static const double frontieContainerHeightFactor = 0.20; // Reduced size
+  static const double frontieContainerHeightFactor = 0.25; // Increased size for more focus
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +16,7 @@ class HomeScreen extends StatelessWidget {
       onWillPop: () async => false,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        extendBody: true,
-        appBar: buildAppBar(),
+
         body: Stack(
           children: [
             buildBackground(),
@@ -26,7 +24,8 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   buildFrontieSection(context),
-                  const SizedBox(height: 20), // Space between sections
+                  buildUpcomingAppointmentsTitle(),
+                  const SizedBox(height: 10), // Space between title and appointment list
                   buildAppointmentList(),
                 ],
               ),
@@ -37,17 +36,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget buildAppBar() {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(appBarHeight),
-      child: AppBar(
-        title: const Text(''),
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-    );
-  }
+
 
   Widget buildBackground() {
     return Container(
@@ -68,102 +57,94 @@ class HomeScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: containerHeight,
-      padding: const EdgeInsets.all(20.0), // Adjusted padding for a sleeker look
+      padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF1E1E2F), // Dark background
-            Color(0xFF2A2A3C), // Slightly lighter dark
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.2), // A blue shadow for a techy feel
-            spreadRadius: 3,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        borderRadius: BorderRadius.circular(20.0), // Slightly more rounded corners
+        color: Colors.black.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(20.0),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align items to the start (top left)
+      child: Row(
         children: [
-          Row(
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  'assets/pogisivenz.png',
-                  width: 50, // Increased size for better visibility
-                  height: 50,
-                  fit: BoxFit.cover,
+          ClipOval(
+            child: Image.asset(
+              'assets/pogisivenz.png',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text(
+                'Dr. Emelyn Vidal',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 15), // Space between image and text
-              Column( // Use Column for the text
-                crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-                children: const [
-                  Text(
-                    'Dr. Emelyn Vidal',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.white, // White for better contrast
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 15), // Space between name and feedback section
-          // Feedback section
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Feedback',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                  ),
-                  style: TextStyle(color: Colors.white), // White text
+              Text(
+                'Your healthcare partner',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  // Handle feedback submission here
-                },
-                icon: Icon(Icons.arrow_forward, color: Colors.grey), // Arrow icon
-              ),
             ],
-          ),
-          Container(
-            height: 1,
-            color: Colors.grey.withOpacity(0.5), // Underline for text field
           ),
         ],
       ),
     );
   }
 
+  Widget buildUpcomingAppointmentsTitle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(right: 8.0),
+            child: Text(
+              'Upcoming Appointments',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Color.fromARGB(255, 14, 117, 206),
+              ),
+            ),
+          ),
+          Icon(Icons.calendar_today, color: Color.fromARGB(255, 14, 117, 206)),
+        ],
+      ),
+    );
+  }
+
   Widget buildAppointmentList() {
-    return FutureBuilder<Map<String, List<Appointment>>>(
-      future: fetchUpcomingAppointments(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('$errorMessage${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty || (snapshot.data!['thisWeek']!.isEmpty && snapshot.data!['nextWeek']!.isEmpty)) {
-          return const Center(child: Text(noAppointmentsMessage));
-        } else {
-          final appointments = snapshot.data!;
-          return buildAppointmentsSections(appointments);
-        }
-      },
+    return Expanded(
+      child: FutureBuilder<Map<String, List<Appointment>>>(
+        future: fetchUpcomingAppointments(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('$errorMessage${snapshot.error}'));
+          } else if (!snapshot.hasData ||
+              snapshot.data!.isEmpty ||
+              (snapshot.data!['thisWeek']!.isEmpty &&
+                  snapshot.data!['nextWeek']!.isEmpty)) {
+            return const Center(
+                child: Text(noAppointmentsMessage,
+                    style: TextStyle(color: Colors.white)));
+          } else {
+            final appointments = snapshot.data!;
+            return buildAppointmentsSections(appointments);
+          }
+        },
+      ),
     );
   }
 
@@ -175,7 +156,6 @@ class HomeScreen extends StatelessWidget {
     final endOfNextWeek = startOfNextWeek.add(const Duration(days: 6));
 
     try {
-      // Fetch all upcoming appointments
       final response = await Supabase.instance.client
           .from('appointments')
           .select()
@@ -190,18 +170,17 @@ class HomeScreen extends StatelessWidget {
       }
 
       final List<dynamic> data = response.data;
-      if (data == null || data.isEmpty) return {'thisWeek': [], 'nextWeek': []}; // Return empty lists
+      if (data == null || data.isEmpty) return {'thisWeek': [], 'nextWeek': []};
 
       final allAppointments = data.map((json) => Appointment.fromJson(json)).toList();
 
-      // Filter appointments into two categories
       final thisWeekAppointments = allAppointments.where((appt) {
-        final appointmentDate = DateTime.parse(appt.date).toUtc(); // Parse as UTC
+        final appointmentDate = DateTime.parse(appt.date).toUtc();
         return appointmentDate.isAfter(startOfWeek) && appointmentDate.isBefore(endOfWeek);
       }).toList();
 
       final nextWeekAppointments = allAppointments.where((appt) {
-        final appointmentDate = DateTime.parse(appt.date).toUtc(); // Parse as UTC
+        final appointmentDate = DateTime.parse(appt.date).toUtc();
         return appointmentDate.isAfter(startOfNextWeek) && appointmentDate.isBefore(endOfNextWeek);
       }).toList();
 
@@ -215,69 +194,64 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildAppointmentsSections(Map<String, List<Appointment>> appointments) {
-    return Expanded( // Ensure it takes available space
-      child: SingleChildScrollView( // Make the list scrollable
-        child: Column(
-          children: [
-            buildCategorySection('This Week', appointments['thisWeek'] ?? []),
-            buildCategorySection('Next Week', appointments['nextWeek'] ?? []),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          buildCategorySection('This Week', appointments['thisWeek'] ?? []),
+          buildCategorySection('Next Week', appointments['nextWeek'] ?? []),
+        ],
       ),
     );
   }
 
   Widget buildCategorySection(String title, List<Appointment> appointments) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (title == 'This Week')
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(right: 8.0),
-                child: Text(
-                  'Upcoming Appointments',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 14, 117, 206),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: appointments.length,
+            itemBuilder: (context, index) {
+              final appointment = appointments[index];
+              final dateTimeUtc = DateTime.parse(appointment.date).toUtc();
+              final dateTimePht = dateTimeUtc.add(const Duration(hours: 8));
+
+              return Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                color: Colors.blueGrey[800],
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ListTile(
+                  leading: const Icon(Icons.calendar_today, color: Colors.white),
+                  title: Text(
+                    '${appointment.service} - ${DateFormat.yMMMd('en_PH').format(dateTimePht)} ${DateFormat.jm('en_PH').format(dateTimePht)}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    'Status: ${appointment.status}',
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
-              ),
-              const Icon(Icons.calendar_today, color: Color.fromARGB(255, 14, 117, 206)),
-            ],
+              );
+            },
           ),
-        const SizedBox(height: 8.0),
-        ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: appointments.length,
-          itemBuilder: (context, index) {
-            final appointment = appointments[index];
-            final dateTimeUtc = DateTime.parse(appointment.date).toUtc(); // Parse as UTC
-            final dateTimePht = dateTimeUtc.add(const Duration(hours: 8)); // Convert to PHT (UTC+8)
-
-            return ListTile(
-              title: Text(
-                '${appointment.service} - ${DateFormat.yMMMd('en_PH').format(dateTimePht)} ${DateFormat.jm('en_PH').format(dateTimePht)}',
-                style: const TextStyle(color: Colors.white),
-              ),
-              subtitle: Text(
-                'Status: ${appointment.status}',
-                style: const TextStyle(color: Colors.grey),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 }
 
 extension on PostgrestResponse {

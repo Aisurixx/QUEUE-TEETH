@@ -62,7 +62,7 @@ class _HistoryPageState extends State<HistoryPage> {
         if (paymentSuccess) {
           final response = await supabase
               .from('appointments')
-              .update({'status': 'Paid'})
+              .update({'status': 'paid'})
               .eq('id', appointmentId)
               .execute();
 
@@ -246,7 +246,7 @@ class _HistoryPageState extends State<HistoryPage> {
         return Colors.orange;
       case 'Cancelled':
         return Colors.red;
-      case 'Paid':
+      case 'paid':
         return Colors.blue;
       default:
         return Colors.black54;

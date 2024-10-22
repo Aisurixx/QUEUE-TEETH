@@ -36,27 +36,12 @@ class _HomePageState extends State<HomePage> {
     HomeScreen(),          // Home Page
     AppointmentPage(),     // Appointments Page
     HistoryPage(),         // History Page
-    // ProfilePage(),      // Removed Profile Page
+    SettingsPage(),        // Settings Page added to bottom navbar
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vidal Queue-Teeth'), // Replace with your app title
-
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings), // Settings icon
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsPage()), // Navigate to SettingsPage
-              );
-            },
-          ),
-        ],
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex), // Displaying the selected page
       ),
@@ -88,7 +73,10 @@ class _HomePageState extends State<HomePage> {
             label: 'History',
             icon: Icons.history_toggle_off_rounded, // History icon
           ),
-          // Removed Profile tab
+          CustomBottomBarItems(
+            label: 'Settings',
+            icon: Icons.settings, // Settings icon added to the navbar
+          ),
         ],
       ),
     );
