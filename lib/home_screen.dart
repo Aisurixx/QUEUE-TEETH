@@ -16,7 +16,6 @@ class HomeScreen extends StatelessWidget {
       onWillPop: () async => false,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-
         body: Stack(
           children: [
             buildBackground(),
@@ -35,8 +34,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget buildBackground() {
     return Container(
@@ -63,37 +60,97 @@ class HomeScreen extends StatelessWidget {
         color: Colors.black.withOpacity(0.7),
         borderRadius: BorderRadius.circular(20.0),
       ),
-      child: Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipOval(
-            child: Image.asset(
-              'assets/pogisivenz.png',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'Dr. Emelyn Vidal',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.white,
+          Row(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  'assets/pogisivenz.png',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
                 ),
               ),
-              Text(
-                'Your healthcare partner',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text(
+                    'Dr. Emelyn Vidal',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Your healthcare partner',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _feedbackController,
+                    decoration: InputDecoration(
+                      hintText: 'Feedback',
+                      hintStyle: TextStyle(color: Colors.white54),
+                      border: InputBorder.none,
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                IconButton(
+  onPressed: () async {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final feedback = _feedbackController.text;
+
+    if (userId != null && feedback.isNotEmpty) {
+      try {
+        final response = await Supabase.instance.client.from('feedback').insert({
+          'user_id': userId,
+          'comments': feedback,
+        }).execute();
+
+        if (response.error != null) {
+          print('Error submitting feedback: ${response.error!.message}');
+        } else {
+          print('Feedback submitted successfully: ${response.data}');
+          _feedbackController.clear();
+        }
+      } catch (e) {
+        print('Exception submitting feedback: $e');
+      }
+    } else {
+      print('User is not authenticated or feedback is empty');
+    }
+  },
+  icon: const Icon(
+    Icons.arrow_circle_right,
+    color: Colors.white,
+  ),
+),
+
+              ],
+            ),
           ),
         ],
       ),
@@ -273,3 +330,5 @@ class Appointment {
     );
   }
 }
+
+final TextEditingController _feedbackController = TextEditingController();
