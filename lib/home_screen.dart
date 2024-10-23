@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   buildFrontieSection(context),
                   buildUpcomingAppointmentsTitle(),
-                  const SizedBox(height: 10), // Space between title and appointment list
+                  const SizedBox(height: 10), // Space between title and appointment listdadw
                   buildAppointmentList(),
                 ],
               ),
