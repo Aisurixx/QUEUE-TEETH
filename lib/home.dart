@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/settingsPage.dart'; // Import the new settings page
+import 'package:queueteeth/screens/profile.dart';
 import 'home_screen.dart';
 import 'book_appointment.dart';
 import 'screens/history.dart';
@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     HomeScreen(),          // Home Page
     AppointmentPage(),     // Appointments Page
     HistoryPage(),         // History Page
-    SettingsPage(),        // Settings Page added to bottom navbar
+    ProfilePage(),         // Profile Page added to bottom navbar
   ];
 
   @override
@@ -74,8 +74,8 @@ class _HomePageState extends State<HomePage> {
             icon: Icons.history_toggle_off_rounded, // History icon
           ),
           CustomBottomBarItems(
-            label: 'Settings',
-            icon: Icons.settings, // Settings icon added to the navbar
+            label: 'Profile',
+            icon: Icons.person, // Profile icon instead of Settings
           ),
         ],
       ),

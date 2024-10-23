@@ -3,12 +3,12 @@ import 'calendar_page.dart';
 
 class AppointmentPage extends StatelessWidget {
   final List<Map<String, String>> choices = [
-    {'value': 'pasta', 'label': 'Pasta', 'price': '700', 'category': 'Orthodontics'},
+    {'value': 'pasta', 'label': 'Pasta', 'price': '700', 'category': 'Dental Services'},
     {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '500', 'category': 'Dental Services'},
-    {'value': 'braces', 'label': 'Braces', 'price': '30000', 'category': 'Orthodontics'},
-    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '1000', 'category': 'Dental Services'},
+    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '1,000', 'category': 'Dental Services'},
     {'value': 'root_canals', 'label': 'Root Canals', 'price': '800', 'category': 'Dental Services'},
     {'value': 'extractions', 'label': 'Extractions', 'price': '700', 'category': 'Dental Services'},
+    {'value': 'braces', 'label': 'Braces', 'price': '30,000', 'category': 'Orthodontics'},
   ];
 
   @override
@@ -39,11 +39,12 @@ class AppointmentPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 50.0), // Adds top margin above "Appointments"
                   Center(
                     child: Text(
                       'Appointments',
                       style: TextStyle(
-                        color: Color(0xFFE5D9F2),
+                        color: Color.fromARGB(255, 252, 252, 252),
                         fontFamily: 'Roboto',
                         fontSize: 28.0, // Adjust font size
                         fontWeight: FontWeight.bold,
@@ -134,7 +135,7 @@ class AppointmentPage extends StatelessWidget {
                           },
                         ),
                         if (services.any((s) => s['label'] == 'Extractions')) 
-                          SizedBox(height: 70.0),
+                          SizedBox(height: 40.0),
                         SizedBox(height: 16.0),
                       ],
                     );

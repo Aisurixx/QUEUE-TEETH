@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   buildFrontieSection(context),
                   buildUpcomingAppointmentsTitle(),
-                  const SizedBox(height: 10), // Space between title and appointment list
+                  const SizedBox(height: 10), // Space between title and appointment listdadw
                   buildAppointmentList(),
                 ],
               ),
@@ -55,7 +55,7 @@ class HomeScreen extends StatelessWidget {
       width: double.infinity,
       height: containerHeight,
       padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.fromLTRB(16.0, 50.0, 16.0, 0), // Add top margin
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.7),
         borderRadius: BorderRadius.circular(20.0),
@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               ClipOval(
                 child: Image.asset(
-                  'assets/pogisivenz.png',
+                  'assets/tita.jpg',
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
@@ -88,7 +88,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Your healthcare partner',
+                    'Your Smile is our Priority',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -156,28 +156,28 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildUpcomingAppointmentsTitle() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Padding(
-            padding: EdgeInsets.only(right: 8.0),
-            child: Text(
-              'Upcoming Appointments',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Color.fromARGB(255, 14, 117, 206),
-              ),
+Widget buildUpcomingAppointmentsTitle() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        Padding(
+          padding: EdgeInsets.only(right: 8.0),
+          child: Text(
+            'Upcoming Appointments',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Color.fromARGB(255, 227, 220, 255), // Updated color
             ),
           ),
-          Icon(Icons.calendar_today, color: Color.fromARGB(255, 14, 117, 206)),
-        ],
-      ),
-    );
-  }
+        ),
+        Icon(Icons.calendar_today, color: Color.fromARGB(255, 227, 220, 255)), // Updated color
+      ],
+    ),
+  );
+}
 
   Widget buildAppointmentList() {
     return Expanded(
