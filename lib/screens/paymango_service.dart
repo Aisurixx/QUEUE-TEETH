@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class PayMongoService {
-  final String apiKey = 'sk_test_JwWDRviSQGg1qajfGmQhrVGN'; // Your PayMongo API key
+  final String apiKey = 'sk_test_UpTctD2WK2N1XvWDkyZjt5PY'; // Your PayMongo API key
 
   Future<String?> createPaymentIntent(double amount, String description) async {
     final String paymongoUrl = 'https://api.paymongo.com/v1/links';

@@ -3,12 +3,12 @@ import 'calendar_page.dart';
 
 class AppointmentPage extends StatelessWidget {
   final List<Map<String, String>> choices = [
-    {'value': 'pasta', 'label': 'Pasta', 'price': '₱700', 'category': 'Orthodontics'},
-    {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '₱500', 'category': 'Dental Services'},
-    {'value': 'braces', 'label': 'Braces', 'price': '₱30000', 'category': 'Orthodontics'},
-    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '₱1000', 'category': 'Dental Services'},
-    {'value': 'root_canals', 'label': 'Root Canals', 'price': '₱800', 'category': 'Dental Services'},
-    {'value': 'extractions', 'label': 'Extractions', 'price': '₱700', 'category': 'Dental Services'},
+    {'value': 'pasta', 'label': 'Pasta', 'price': '700', 'category': 'Orthodontics'},
+    {'value': 'teeth_clean', 'label': 'Teeth Cleaning', 'price': '500', 'category': 'Dental Services'},
+    {'value': 'braces', 'label': 'Braces', 'price': '30000', 'category': 'Orthodontics'},
+    {'value': 'teeth_whitening', 'label': 'Teeth Whitening', 'price': '1000', 'category': 'Dental Services'},
+    {'value': 'root_canals', 'label': 'Root Canals', 'price': '800', 'category': 'Dental Services'},
+    {'value': 'extractions', 'label': 'Extractions', 'price': '700', 'category': 'Dental Services'},
   ];
 
   @override
@@ -74,7 +74,7 @@ class AppointmentPage extends StatelessWidget {
                             crossAxisCount: 1,
                             crossAxisSpacing: 16.0,
                             mainAxisSpacing: 16.0,
-                            childAspectRatio: 3.5,
+                            childAspectRatio: 4.5,
                           ),
                           itemBuilder: (context, index) {
                             final service = services[index]['label']!;
@@ -92,40 +92,37 @@ class AppointmentPage extends StatelessWidget {
                                   );
                                 },
                                 child: Container(
-                                  height: 50.0, // Increased height for better usability
+                                  height: 70.0, // Increased height for better usability
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [Color(0xFF615792), Color(0xFFE5D9F2)],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
+                                    color: Color(0xFFE5D9F2),
+                                    borderRadius: BorderRadius.circular(20.0),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black26,
-                                        blurRadius: 5.0,
-                                        offset: Offset(0, 3),
+                                        blurRadius: 6.0,
+                                        offset: Offset(0, 2),
                                       ),
                                     ],
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16.0), // Increased padding for better spacing
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           service,
                                           style: TextStyle(
-                                            color: const Color.fromARGB(255, 255, 255, 255),
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         Text(
                                           price,
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 14.0,
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ],
