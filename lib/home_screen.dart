@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:queueteeth/Location.dart';
+import 'package:queueteeth/Services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart'; // For date formatting
+
+
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,7 +28,7 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   buildFrontieSection(context),
-                  buildButtonSection(),
+                  buildButtonSection(context),
                   buildUpcomingAppointmentsTitle(),
                   const SizedBox(height: 10), // Space between title and appointment list
                   buildAppointmentList(),
@@ -157,57 +162,86 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildButtonSection() {
+  Widget buildButtonSection(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        buildIconButton('assets/receipt.png', "Receipt"),
-        buildIconButton('assets/services.png', "Services"),
-        buildIconButton('assets/location.png', "Location"),
+        buildIconButton(
+          'assets/receipt.png',
+          "Receipt",
+          () {
+            // Add logic if needed for Receipt button
+          },
+        ),
+        buildIconButton(
+          'assets/services.png',
+          "Services",
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ServicesScreen()),
+            );
+          },
+        ),
+        buildIconButton(
+          'assets/location.png',
+          "Location",
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LocationScreen()),
+            );
+          },
+        ),
       ],
     ),
   );
 }
 
-Widget buildIconButton(String iconPath, String label) {
-  return Column(
-    children: [
-      Container(
-        width: 70,
-        height: 70,
-        padding: const EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          color: Colors.pink.shade50,
-          borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              offset: const Offset(0, 4),
-              blurRadius: 8,
-            ),
-          ],
+
+Widget buildIconButton(String iconPath, String label, VoidCallback onPressed) {
+  return GestureDetector(
+    onTap: onPressed,
+    child: Column(
+      children: [
+        Container(
+          width: 70,
+          height: 70,
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: Colors.pink.shade50,
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                offset: const Offset(0, 4),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Image.asset(
+            iconPath,
+            width: 40,
+            height: 40,
+            fit: BoxFit.contain,
+          ),
         ),
-        child: Image.asset(
-          iconPath,
-          width: 40,
-          height: 40,
-          fit: BoxFit.contain,
+        const SizedBox(height: 8.0), // Space between icon and text
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Color.fromARGB(255, 255, 255, 255),
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ),
-      const SizedBox(height: 8.0), // Space between icon and text
-      Text(
-        label,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Color.fromARGB(255, 255, 255, 255),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    ],
+      ],
+    ),
   );
 }
+
 
 
   Widget buildUpcomingAppointmentsTitle() {
