@@ -23,8 +23,9 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   buildFrontieSection(context),
+                  buildButtonSection(),
                   buildUpcomingAppointmentsTitle(),
-                  const SizedBox(height: 10), // Space between title and appointment listdadw
+                  const SizedBox(height: 10), // Space between title and appointment list
                   buildAppointmentList(),
                 ],
               ),
@@ -156,28 +157,81 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-Widget buildUpcomingAppointmentsTitle() {
+  Widget buildButtonSection() {
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+    padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Padding(
-          padding: EdgeInsets.only(right: 8.0),
-          child: Text(
-            'Upcoming Appointments',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Color.fromARGB(255, 227, 220, 255), // Updated color
-            ),
-          ),
-        ),
-        Icon(Icons.calendar_today, color: Color.fromARGB(255, 227, 220, 255)), // Updated color
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        buildIconButton('assets/receipt.png', "Receipt"),
+        buildIconButton('assets/services.png', "Services"),
+        buildIconButton('assets/location.png', "Location"),
       ],
     ),
   );
 }
+
+Widget buildIconButton(String iconPath, String label) {
+  return Column(
+    children: [
+      Container(
+        width: 70,
+        height: 70,
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.pink.shade50,
+          borderRadius: BorderRadius.circular(20.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              offset: const Offset(0, 4),
+              blurRadius: 8,
+            ),
+          ],
+        ),
+        child: Image.asset(
+          iconPath,
+          width: 40,
+          height: 40,
+          fit: BoxFit.contain,
+        ),
+      ),
+      const SizedBox(height: 8.0), // Space between icon and text
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 16,
+          color: Color.fromARGB(255, 255, 255, 255),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ],
+  );
+}
+
+
+  Widget buildUpcomingAppointmentsTitle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(right: 8.0),
+            child: Text(
+              'Upcoming Appointments',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Color.fromARGB(255, 227, 220, 255), // Updated color
+              ),
+            ),
+          ),
+          Icon(Icons.calendar_today, color: Color.fromARGB(255, 227, 220, 255)), // Updated color
+        ],
+      ),
+    );
+  }
 
   Widget buildAppointmentList() {
     return Expanded(
@@ -262,7 +316,7 @@ Widget buildUpcomingAppointmentsTitle() {
 
   Widget buildCategorySection(String title, List<Appointment> appointments) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 14.0), // Adjusted padding to make it smaller
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -270,11 +324,11 @@ Widget buildUpcomingAppointmentsTitle() {
             title,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 16, // Reduced font size for a smaller appearance
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 8.0),
+          const SizedBox(height: 6.0), // Reduced space between title and appointments
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -286,86 +340,85 @@ Widget buildUpcomingAppointmentsTitle() {
               final daysRemaining = DateTime.now().toUtc().difference(dateTimeUtc).inDays.abs();
 
               return Container(
-  margin: const EdgeInsets.symmetric(vertical: 8.0),
-  padding: const EdgeInsets.all(15.0),
-  decoration: BoxDecoration(
-    color: const Color(0xFF39424e),
-    borderRadius: BorderRadius.circular(10.0),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.2),
-        offset: const Offset(0, 4),
-        blurRadius: 8,
-      ),
-    ],
-  ),
-  child: Stack(
-    children: [
-      Positioned(
-        right: 10,
-        top: 10,
-        child: Icon(
-          Icons.calendar_today,
-          color: Colors.white,
-        ),
-      ),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            appointment.service,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            DateFormat.yMMMd('en_PH').format(dateTimePht) +
-                ' ' +
-                DateFormat.jm('en_PH').format(dateTimePht),
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFFCCCCCC),
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Row(
-            children: [
-              Icon(
-                appointment.status == 'paid' ? Icons.check_circle : Icons.error,
-                color: appointment.status == 'paid' ? Colors.green : Colors.red,
-                size: 16.0,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                'Status: ${appointment.status}',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: appointment.status == 'paid'
-                      ? const Color(0xFF00FF00)
-                      : const Color(0xFFFF0000),
-                  fontWeight: FontWeight.bold,
+                margin: const EdgeInsets.symmetric(vertical: 6.0), // Reduced margin for a smaller appearance
+                padding: const EdgeInsets.all(12.0), // Reduced padding for a more compact look
+                decoration: BoxDecoration(
+                  color: const Color(0xFF39424e),
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            'Days until appointment: $daysRemaining',
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFFFFA500),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ],
-  ),
-);
-
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: Icon(
+                        Icons.calendar_today,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          appointment.service,
+                          style: const TextStyle(
+                            fontSize: 16, // Reduced font size for compactness
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 6.0), // Reduced space between elements
+                        Text(
+                          DateFormat.yMMMd('en_PH').format(dateTimePht) +
+                              ' ' +
+                              DateFormat.jm('en_PH').format(dateTimePht),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFFCCCCCC),
+                          ),
+                        ),
+                        const SizedBox(height: 6.0),
+                        Row(
+                          children: [
+                            Icon(
+                              appointment.status == 'paid' ? Icons.check_circle : Icons.error,
+                              color: appointment.status == 'paid' ? Colors.green : Colors.red,
+                              size: 16.0,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              'Status: ${appointment.status}',
+                              style: TextStyle(
+                                fontSize: 14, // Reduced font size for compactness
+                                color: appointment.status == 'paid'
+                                    ? const Color(0xFF00FF00)
+                                    : const Color(0xFFFF0000),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6.0),
+                        Text(
+                          'Days until appointment: $daysRemaining',
+                          style: const TextStyle(
+                            fontSize: 14, // Reduced font size
+                            color: Color(0xFFFFA500),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ],
