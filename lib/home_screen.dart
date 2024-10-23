@@ -286,73 +286,86 @@ Widget buildUpcomingAppointmentsTitle() {
               final daysRemaining = DateTime.now().toUtc().difference(dateTimeUtc).inDays.abs();
 
               return Container(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                padding: const EdgeInsets.all(15.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF39424e),
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      offset: const Offset(0, 4),
-                      blurRadius: 8,
-                    ),
-                  ],
+  margin: const EdgeInsets.symmetric(vertical: 8.0),
+  padding: const EdgeInsets.all(15.0),
+  decoration: BoxDecoration(
+    color: const Color(0xFF39424e),
+    borderRadius: BorderRadius.circular(10.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.2),
+        offset: const Offset(0, 4),
+        blurRadius: 8,
+      ),
+    ],
+  ),
+  child: Stack(
+    children: [
+      Positioned(
+        right: 10,
+        top: 10,
+        child: Icon(
+          Icons.calendar_today,
+          color: Colors.white,
+        ),
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            appointment.service,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Text(
+            DateFormat.yMMMd('en_PH').format(dateTimePht) +
+                ' ' +
+                DateFormat.jm('en_PH').format(dateTimePht),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFFCCCCCC),
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            children: [
+              Icon(
+                appointment.status == 'paid' ? Icons.check_circle : Icons.error,
+                color: appointment.status == 'paid' ? Colors.green : Colors.red,
+                size: 16.0,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                'Status: ${appointment.status}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: appointment.status == 'paid'
+                      ? const Color(0xFF00FF00)
+                      : const Color(0xFFFF0000),
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: 10,
-                      top: 10,
-                      child: Icon(
-                        Icons.calendar_today,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          appointment.service,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          DateFormat.yMMMd('en_PH').format(dateTimePht) +
-                              ' ' +
-                              DateFormat.jm('en_PH').format(dateTimePht),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFFCCCCCC),
-                          ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          'Status: ${appointment.status}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF00FF00),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          'Days until appointment: $daysRemaining',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFFFFA500),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Text(
+            'Days until appointment: $daysRemaining',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFFFFA500),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ],
+  ),
+);
+
             },
           ),
         ],
