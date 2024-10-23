@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:queueteeth/login.dart';
-import 'package:queueteeth/screens/SettingsPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -9,9 +8,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final String imagePath = 'assets/pogisivenz.png';
+  final String imagePath = 'assets/pogiako.jpg';
   final String backgroundImagePath = 'assets/splash.png';
-  final String appBarBackgroundImagePath = 'assets/appbar.png';
   String userName = 'Loading...';
 
   @override
@@ -21,106 +19,75 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _fetchUserProfile() async {
-  try {
-    final user = Supabase.instance.client.auth.currentUser;
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
 
-    // Check if user is logged in
-    if (user == null) {
-      // No user is logged in
+      if (user == null) {
+        setState(() {
+          userName = 'User not logged in';
+        });
+        return;
+      }
+
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single()
+          .execute();
+
+      if (response.error != null) {
+        setState(() {
+          userName = 'Error: ${response.error!.message}';
+        });
+      } else if (response.data == null) {
+        setState(() {
+          userName = 'No profile found';
+        });
+      } else {
+        final data = response.data as Map<String, dynamic>;
+        setState(() {
+          userName = data['username'] ?? 'No Name Available';
+        });
+      }
+    } catch (e) {
       setState(() {
-        userName = 'User not logged in';
+        userName = 'Unexpected error occurred: $e';
       });
-      print('No user is currently logged in.');
-      return;
     }
-
-    print('Current User ID: ${user.id}'); // Debugging: Print current user ID
-
-    // Fetch username from the 'profiles' table where id matches the current user ID
-    final response = await Supabase.instance.client
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single()
-        .execute();
-
-    if (response.error != null) {
-      // Supabase returned an error
-      setState(() {
-        userName = 'Error: ${response.error!.message}';
-      });
-      print('Supabase Error: ${response.error!.message}');
-    } else if (response.data == null) {
-      // No data found for this user
-      setState(() {
-        userName = 'No profile found';
-      });
-      print('No profile found for user ID: ${user.id}');
-    } else {
-      // Successfully retrieved the username
-      final data = response.data as Map<String, dynamic>;
-      setState(() {
-        userName = data['username'] ?? 'No Name Available';
-      });
-      print('Username fetched successfully: ${data['username']}');
-    }
-  } catch (e) {
-    // Handle any unexpected exceptions
-    setState(() {
-      userName = 'Unexpected error occurred: $e';
-    });
-    print('Unexpected error: $e');
   }
-}
 
-
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(appBarBackgroundImagePath),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: AppBar(
-            title: const Text(
-              'Profile',
-              style: TextStyle(color: Color(0xFFE5D9F2)),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(0xFFE5D9F2)),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
-                );
-              },
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-        ),
-      ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
+        width: double.infinity, // Fill the width of the screen
+        height: double.infinity, // Fill the height of the screen
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(backgroundImagePath),
-            fit: BoxFit.cover,
+            image: AssetImage(backgroundImagePath), // Background image for body
+            fit: BoxFit.cover, // Cover the entire screen
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start, // Align items to the top
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 40),
+              const SizedBox(height: 60), // Add space from the top for the "Profile" text
+
+
+              const Text(
+                'Profile',
+                style: TextStyle(
+                 fontFamily: 'Roboto',
+                  fontSize: 28.0, // Adjust font size
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
 
               CircleAvatar(
                 radius: 60.0,
@@ -129,7 +96,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 20),
 
-              // User's Name
               Text(
                 userName,
                 style: const TextStyle(
@@ -142,9 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               ElevatedButton(
                 onPressed: () {
-                  // Log out the user
                   Supabase.instance.client.auth.signOut();
-                  // Navigate to sign-in page
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => SignInPage()),

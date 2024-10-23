@@ -99,7 +99,7 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
           Column(
             children: [
-              const SizedBox(height: 16),
+               const SizedBox(height: 50.0), // Adds top margin above "History"
               // History Title with Background Image (replacing the AppBar)
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -108,7 +108,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Text(
                     'History',
                     style: TextStyle(
-                      color: Color(0xFFE5D9F2),
+                      color: Color.fromARGB(255, 255, 255, 255),
                       fontSize: 28.0,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Roboto',
@@ -141,7 +141,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           Text(
                             'Services and Appointments',
                             style: TextStyle(
-                              color: Color(0xFFE5D9F2),
+                              color: Color.fromARGB(255, 255, 255, 255),
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Roboto',

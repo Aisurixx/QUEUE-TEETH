@@ -90,6 +90,8 @@ flutter:
     - assets/appbar.png
     - assets/image 52.png
     - assets/user.png
+    - assets/tita.jpg
+    - assets/pogiako.jpg
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

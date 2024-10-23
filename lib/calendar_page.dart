@@ -222,53 +222,71 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Book Appointment',
-          style: TextStyle(color: Color(0xFFE5D9F2)),
-        ),
-        backgroundColor: Colors.blueAccent,
-        iconTheme: IconThemeData(color: Color(0xFFE5D9F2)),
-        flexibleSpace: Image.asset(
-          'assets/appbar.png',
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/splash.png'),
           fit: BoxFit.cover,
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/splash.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            SizedBox(height: 50), // Adjust the height as needed
+            // Back button and title
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: 50, // Set the width of the back button
+                  height: 50, // Set the height of the back button
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white, size: 40), // Adjust icon size if needed
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
                 ),
-                padding: EdgeInsets.all(16.0),
-                child: TableCalendar(
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    if (_bookedAppointments.containsKey(selectedDay)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("This date is already fully booked.")),
-                      );
-                    } else {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                    }
-                  },
+                SizedBox(width: 8),
+                Text(
+                  'Book Appointment',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 252, 252, 252),
+                    fontFamily: 'Roboto',
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20), // Space between title and calendar
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              padding: EdgeInsets.all(16.0),
+              child: TableCalendar(
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (_bookedAppointments.containsKey(selectedDay)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("This date is already fully booked.")),
+                    );
+                  } else {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  }
+                },
+
+
                   firstDay: DateTime.now(),
                   lastDay: DateTime.now().add(Duration(days: 365)),
                   eventLoader: (day) {

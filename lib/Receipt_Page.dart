@@ -39,7 +39,7 @@ class ReceiptPage extends StatelessWidget {
                     "Appointment Fee",
                     style: TextStyle(
                       fontSize: 30, // Adjust the font size as needed
-                      color: Color(0xFFE5D9F2), // Set text color
+                      color: Color.fromARGB(255, 248, 248, 248), // Set text color
                     ),
                   ),
                   SizedBox(height: 20), // Space between the title and content
