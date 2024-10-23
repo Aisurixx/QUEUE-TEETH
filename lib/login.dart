@@ -43,7 +43,6 @@ class _SignInPageState extends State<SignInPage> {
   static const String emptyPasswordMessage = 'Please enter your password';
   static const String shortPasswordMessage = 'Password must be at least 6 characters long';
   static const String signInSuccessMessage = 'Sign in successful!';
-  static const String signInErrorMessage = 'Invalid email or password';
   static const String errorMessage = 'Error: ';
 
   // Method to show dialog

@@ -119,36 +119,35 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-  onPressed: () async {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
-    final feedback = _feedbackController.text;
+                  onPressed: () async {
+                    final userId = Supabase.instance.client.auth.currentUser?.id;
+                    final feedback = _feedbackController.text;
 
-    if (userId != null && feedback.isNotEmpty) {
-      try {
-        final response = await Supabase.instance.client.from('feedback').insert({
-          'user_id': userId,
-          'comments': feedback,
-        }).execute();
+                    if (userId != null && feedback.isNotEmpty) {
+                      try {
+                        final response = await Supabase.instance.client.from('feedback').insert({
+                          'user_id': userId,
+                          'comments': feedback,
+                        }).execute();
 
-        if (response.error != null) {
-          print('Error submitting feedback: ${response.error!.message}');
-        } else {
-          print('Feedback submitted successfully: ${response.data}');
-          _feedbackController.clear();
-        }
-      } catch (e) {
-        print('Exception submitting feedback: $e');
-      }
-    } else {
-      print('User is not authenticated or feedback is empty');
-    }
-  },
-  icon: const Icon(
-    Icons.arrow_circle_right,
-    color: Colors.white,
-  ),
-),
-
+                        if (response.error != null) {
+                          print('Error submitting feedback: ${response.error!.message}');
+                        } else {
+                          print('Feedback submitted successfully: ${response.data}');
+                          _feedbackController.clear();
+                        }
+                      } catch (e) {
+                        print('Exception submitting feedback: $e');
+                      }
+                    } else {
+                      print('User is not authenticated or feedback is empty');
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.arrow_circle_right,
+                    color: Colors.white,
+                  ),
+                ),
               ],
             ),
           ),
@@ -227,7 +226,7 @@ class HomeScreen extends StatelessWidget {
       }
 
       final List<dynamic> data = response.data;
-      if (data == null || data.isEmpty) return {'thisWeek': [], 'nextWeek': []};
+      if (data.isEmpty) return {'thisWeek': [], 'nextWeek': []};
 
       final allAppointments = data.map((json) => Appointment.fromJson(json)).toList();
 
@@ -284,23 +283,74 @@ class HomeScreen extends StatelessWidget {
               final appointment = appointments[index];
               final dateTimeUtc = DateTime.parse(appointment.date).toUtc();
               final dateTimePht = dateTimeUtc.add(const Duration(hours: 8));
+              final daysRemaining = DateTime.now().toUtc().difference(dateTimeUtc).inDays.abs();
 
-              return Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                color: Colors.blueGrey[800],
+              return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
-                child: ListTile(
-                  leading: const Icon(Icons.calendar_today, color: Colors.white),
-                  title: Text(
-                    '${appointment.service} - ${DateFormat.yMMMd('en_PH').format(dateTimePht)} ${DateFormat.jm('en_PH').format(dateTimePht)}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Text(
-                    'Status: ${appointment.status}',
-                    style: const TextStyle(color: Colors.grey),
-                  ),
+                padding: const EdgeInsets.all(15.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF39424e),
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: Icon(
+                        Icons.calendar_today,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          appointment.service,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          DateFormat.yMMMd('en_PH').format(dateTimePht) +
+                              ' ' +
+                              DateFormat.jm('en_PH').format(dateTimePht),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFFCCCCCC),
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          'Status: ${appointment.status}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF00FF00),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          'Days until appointment: $daysRemaining',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFFFFA500),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               );
             },
