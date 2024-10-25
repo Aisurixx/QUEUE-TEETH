@@ -1,6 +1,7 @@
 import 'dart:ui'; // Import this for BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:queueteeth/home.dart'; // Import the home screen
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ReceiptPage extends StatelessWidget {
   final String service;
@@ -14,6 +15,32 @@ class ReceiptPage extends StatelessWidget {
     required this.time,
     required this.price,
   });
+
+  Future<void> _saveReceipt(BuildContext context) async {
+    // Fetch the authenticated user
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      // Handle unauthenticated user
+      print('No user is currently authenticated.');
+      return;
+    }
+
+    // Save receipt to the database, including the user ID
+    final response = await Supabase.instance.client.from('receipts').insert({
+      'user_id': user.id, // Add the user ID to associate the receipt with the user
+      'service': service,
+      'date': date.toIso8601String(),
+      'time': time.format(context),
+      'price': price,
+    }).execute();
+
+    if (response.error != null) {
+      print('Error saving receipt: ${response.error!.message}');
+    } else {
+      print('Receipt saved successfully');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +114,8 @@ class ReceiptPage extends StatelessWidget {
                         backgroundColor: Colors.transparent, // Make button background transparent to show the gradient
                         shadowColor: Colors.transparent, // Remove shadow to maintain the gradient effect
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        await _saveReceipt(context); // Pass context here
                         // Navigate to HomeScreen
                         Navigator.pushAndRemoveUntil(
                           context,
@@ -109,4 +137,8 @@ class ReceiptPage extends StatelessWidget {
       ),
     );
   }
+}
+
+extension on PostgrestResponse {
+  get error => null;
 }

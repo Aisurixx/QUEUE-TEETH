@@ -56,10 +56,20 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_native_splash: ^2.0.0
+  flutter_launcher_icons: ^0.9.2
+
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+
 
 flutter_native_splash:
   color: "#ffffff"  # Background color
   image: assets/logo.png  # Path to your logo/image
+  
   
 
 
@@ -95,7 +105,7 @@ flutter:
     - assets/location.png
     - assets/receipt.png
     - assets/services.png
-
+    - assets/icon.png
 
 
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queueteeth/Location.dart';
 import 'package:queueteeth/Services.dart';
+import 'package:queueteeth/receipts_here.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
@@ -172,7 +173,10 @@ class HomeScreen extends StatelessWidget {
           'assets/receipt.png',
           "Receipt",
           () {
-            // Add logic if needed for Receipt button
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ReceiptsHere()),
+            );
           },
         ),
         buildIconButton(
